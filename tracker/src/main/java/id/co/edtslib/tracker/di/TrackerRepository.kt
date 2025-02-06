@@ -104,13 +104,13 @@ class TrackerRepository(
                 configurationLocalSource.getLongitude()),
             marketing = configurationLocalSource.getCached()?.installReferer)
 
-        val trackerDatas = TrackerDataList(mutableListOf(trackerData))
+        val trackerDataList = TrackerDataList(mutableListOf(trackerData))
 
-        val response = remoteSource.send(trackerDatas)
+        val response = remoteSource.send(trackerDataList)
         when(response.status) {
             Result.Status.SUCCESS -> {}
             Result.Status.ERROR, Result.Status.UNAUTHORIZED -> {
-                localSource.add(trackerDatas)
+                localSource.add(trackerDataList)
             }
             else -> {}
         }
@@ -229,13 +229,13 @@ class TrackerRepository(
                 configurationLocalSource.getLongitude()),
             marketing = configurationLocalSource.getCached()?.installReferer)
 
-        val trackerDatas = TrackerDataList(mutableListOf(trackerData))
+        val trackerDataList = TrackerDataList(mutableListOf(trackerData))
 
-        val response = remoteSource.send(trackerDatas)
+        val response = remoteSource.send(trackerDataList)
         when(response.status) {
             Result.Status.SUCCESS -> emit(TrackerResponse(Gson().toJson(trackerData), response.data))
             Result.Status.ERROR, Result.Status.UNAUTHORIZED -> {
-                localSource.add(trackerDatas)
+                localSource.add(trackerDataList)
                 emit(
                     TrackerResponse(Gson().toJson(trackerData), null)
                 )
@@ -259,13 +259,13 @@ class TrackerRepository(
             application = localSource.apps,
             marketing = configurationLocalSource.getCached()?.installReferer)
 
-        val trackerDatas = TrackerDataList(mutableListOf(trackerData))
+        val trackerDataList = TrackerDataList(mutableListOf(trackerData))
 
-        val response = remoteSource.send(trackerDatas)
+        val response = remoteSource.send(trackerDataList)
         when(response.status) {
             Result.Status.SUCCESS -> emit(TrackerResponse(Gson().toJson(trackerData), response.data))
             Result.Status.ERROR, Result.Status.UNAUTHORIZED -> {
-                localSource.add(trackerDatas)
+                localSource.add(trackerDataList)
                 emit(
                     TrackerResponse(Gson().toJson(trackerData), null)
                 )
@@ -288,13 +288,13 @@ class TrackerRepository(
                 configurationLocalSource.getLongitude()),
             marketing = configurationLocalSource.getCached()?.installReferer)
 
-        val trackerDatas = TrackerDataList(mutableListOf(trackerData))
+        val trackerDataList = TrackerDataList(mutableListOf(trackerData))
 
-        val response = remoteSource.send(trackerDatas)
+        val response = remoteSource.send(trackerDataList)
         when(response.status) {
             Result.Status.SUCCESS -> emit(TrackerResponse(Gson().toJson(trackerData), response.data))
             Result.Status.ERROR, Result.Status.UNAUTHORIZED -> {
-                localSource.add(trackerDatas)
+                localSource.add(trackerDataList)
                 emit(
                     TrackerResponse(Gson().toJson(trackerData), null)
                 )
@@ -307,6 +307,7 @@ class TrackerRepository(
         val mappedData = mutableListOf<T>()
         if (mapper != null) {
             for (d in data) {
+
                 val newD = mapper.invoke(d as S)
                 if (newD != null) mappedData.add(newD)
             }
@@ -327,13 +328,13 @@ class TrackerRepository(
                 configurationLocalSource.getLongitude()),
             marketing = configurationLocalSource.getCached()?.installReferer)
 
-        val trackerDatas = TrackerDataList(mutableListOf(trackerData))
+        val trackerDataList = TrackerDataList(mutableListOf(trackerData))
 
-        val response = remoteSource.send(trackerDatas)
+        val response = remoteSource.send(trackerDataList)
         when(response.status) {
             Result.Status.SUCCESS -> emit(TrackerResponse(Gson().toJson(trackerData), response.data))
             Result.Status.ERROR, Result.Status.UNAUTHORIZED -> {
-                localSource.add(trackerDatas)
+                localSource.add(trackerDataList)
                 emit(
                     TrackerResponse(Gson().toJson(trackerData), null)
                 )
@@ -366,19 +367,25 @@ class TrackerRepository(
                 configurationLocalSource.getLongitude()),
             marketing = configurationLocalSource.getCached()?.installReferer)
 
-        val trackerDatas = TrackerDataList(mutableListOf(trackerData))
+        val trackerDataList = TrackerDataList(mutableListOf(trackerData))
 
-        val response = remoteSource.send(trackerDatas)
-        when(response.status) {
-            Result.Status.SUCCESS -> emit(TrackerResponse(Gson().toJson(trackerData), response.data))
-            Result.Status.ERROR, Result.Status.UNAUTHORIZED -> {
-                localSource.add(trackerDatas)
-                emit(
-                    TrackerResponse(Gson().toJson(trackerData), null)
-                )
+        try {
+            val response = remoteSource.send(trackerDataList)
+            when(response.status) {
+                Result.Status.SUCCESS -> emit(TrackerResponse(Gson().toJson(trackerData), response.data))
+                Result.Status.ERROR, Result.Status.UNAUTHORIZED -> {
+                    localSource.add(trackerDataList)
+                    emit(
+                        TrackerResponse(Gson().toJson(trackerData), null)
+                    )
+                }
+                else -> {}
             }
-            else -> {}
         }
+        catch (ignore: OutOfMemoryError) {
+
+        }
+
     }
 
     override fun trackDisplayedItems(
@@ -397,13 +404,13 @@ class TrackerRepository(
                 configurationLocalSource.getLongitude()),
             marketing = configurationLocalSource.getCached()?.installReferer)
 
-        val trackerDatas = TrackerDataList(mutableListOf(trackerData))
+        val trackerDataList = TrackerDataList(mutableListOf(trackerData))
 
-        val response = remoteSource.send(trackerDatas)
+        val response = remoteSource.send(trackerDataList)
         when(response.status) {
             Result.Status.SUCCESS -> emit(TrackerResponse(Gson().toJson(trackerData), response.data))
             Result.Status.ERROR, Result.Status.UNAUTHORIZED -> {
-                localSource.add(trackerDatas)
+                localSource.add(trackerDataList)
                 emit(
                     TrackerResponse(Gson().toJson(trackerData), null)
                 )
@@ -430,13 +437,13 @@ class TrackerRepository(
                 configurationLocalSource.getLongitude()),
             marketing = configurationLocalSource.getCached()?.installReferer)
 
-        val trackerDatas = TrackerDataList(mutableListOf(trackerData))
+        val trackerDataList = TrackerDataList(mutableListOf(trackerData))
 
-        val response = remoteSource.send(trackerDatas)
+        val response = remoteSource.send(trackerDataList)
         when(response.status) {
             Result.Status.SUCCESS -> emit(TrackerResponse(Gson().toJson(trackerData), response.data))
             Result.Status.ERROR, Result.Status.UNAUTHORIZED -> {
-                localSource.add(trackerDatas)
+                localSource.add(trackerDataList)
                 emit(
                     TrackerResponse(Gson().toJson(trackerData), null)
                 )
