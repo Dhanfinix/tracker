@@ -85,7 +85,12 @@ open class TrackerViewModel(
         details: Any? = null
     ) {
         viewModelScope.launch(Dispatchers.IO) {
-            trackerUseCase.trackClick(name, category, url, details).collect()
+            try {
+                trackerUseCase.trackClick(name, category, url, details).collect()
+            }
+            catch (ignore: Error) {
+
+            }
         }
     }
 
