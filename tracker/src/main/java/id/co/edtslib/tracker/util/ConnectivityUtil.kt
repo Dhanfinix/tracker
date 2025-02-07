@@ -31,6 +31,8 @@ object ConnectivityUtil {
             }
         } catch (ignored: Exception) {
         } // for now eat exceptions
+        catch (ignored: Error) {
+        } // for now eat exceptions
         return ""
     }
 }
