@@ -350,13 +350,19 @@ class TrackerRepository(
         reason: String?,
         details: Any?
     ) = flow {
+        val map = if (details is MutableMap<*, *>) {
+            details.toMap()
+        }
+        else {
+            null
+        }
         val trackerCore = TrackerSubmissionCore.create(
             eventId = configurationLocalSource.getEventId(),
             label = name,
             category = category,
             status = status,
             reason = reason,
-            details = details,
+            details = map ?: details,
             service = configurationLocalSource.getService() ?: "")
         val trackerData = TrackerData(
             core = trackerCore,

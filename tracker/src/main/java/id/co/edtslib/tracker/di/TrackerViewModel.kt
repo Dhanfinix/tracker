@@ -88,7 +88,7 @@ open class TrackerViewModel(
             try {
                 trackerUseCase.trackClick(name, category, url, details).collect()
             }
-            catch (ignore: Error) {
+            catch (_: Error) {
 
             }
         }
