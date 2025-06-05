@@ -1,7 +1,10 @@
 package id.co.edtslib.tracker
 
+import android.app.Activity
 import android.app.Application
+import android.app.Application.ActivityLifecycleCallbacks
 import android.content.Intent
+import android.os.Bundle
 import androidx.fragment.app.FragmentActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -20,6 +23,8 @@ import id.co.edtslib.tracker.di.networkingModule
 import id.co.edtslib.tracker.di.repositoryModule
 import id.co.edtslib.tracker.di.sharedPreferencesModule
 import id.co.edtslib.tracker.di.viewModule
+import id.co.edtslib.tracker.ui.TrackerInflateFactory
+import id.co.edtslib.tracker.ui.TrackerInterceptor
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.KoinApplication
 import org.koin.core.component.KoinComponent
@@ -70,9 +75,11 @@ class Tracker private constructor() : KoinComponent {
             if (tracker == null) {
                 tracker = Tracker()
             }
+
+            registerActivityLifecycleCallbacks(application)
         }
 
-        fun init(baseUrl: String, token: String, koin: KoinApplication) {
+        fun init(baseUrl: String, token: String, koin: KoinApplication, application: Application? = null) {
             Tracker.baseUrl = baseUrl
             Tracker.token = token
 
@@ -90,6 +97,51 @@ class Tracker private constructor() : KoinComponent {
             if (tracker == null) {
                 tracker = Tracker()
             }
+
+            registerActivityLifecycleCallbacks(application)
+        }
+
+        private fun setTrackerInflateFactory(activity: Activity) {
+            val inflater = activity.layoutInflater
+            val originalFactory = inflater.factory2
+            if (originalFactory !is TrackerInflateFactory) {
+                inflater.factory2 = TrackerInflateFactory(originalFactory)
+            }
+        }
+
+        private fun registerActivityLifecycleCallbacks(application: Application?) {
+            application?.registerActivityLifecycleCallbacks(object : ActivityLifecycleCallbacks {
+                override fun onActivityPreCreated(
+                    activity: Activity,
+                    savedInstanceState: Bundle?
+                ) {
+                    setTrackerInflateFactory(activity)
+                }
+
+                override fun onActivityCreated(activity: Activity, savedInstanceState: Bundle?) {
+                    TrackerInterceptor.touchDispatch(activity)
+                }
+
+                override fun onActivityStarted(activity: Activity) {
+                }
+
+                override fun onActivityResumed(activity: Activity) {
+
+                }
+
+                override fun onActivityPaused(activity: Activity) {
+                }
+
+                override fun onActivityStopped(activity: Activity) {
+                }
+
+                override fun onActivitySaveInstanceState(activity: Activity, outState: Bundle) {
+                }
+
+                override fun onActivityDestroyed(activity: Activity) {
+                }
+
+            })
         }
 
         fun getInstallReferer() = tracker?.trackerViewModel?.getInstallReferer()

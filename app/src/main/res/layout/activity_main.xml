@@ -1,8 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
-<id.co.edtslib.edtsds.list.menu.MenuListView xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:id="@+id/menuListView"
-    tools:context=".MainActivity" />
+    android:orientation="vertical"
+    tools:context=".MainActivity">
+    <androidx.appcompat.widget.AppCompatTextView
+        android:focusable="true"
+        app:trackerClickLabel="click me"
+        app:trackerClickCategory="click"
+        android:layout_width="match_parent"
+        android:text="Click Me!"
+
+        android:paddingVertical="16dp"
+        android:layout_height="wrap_content" />
+    <id.co.edtslib.edtsds.list.menu.MenuListView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/menuListView"
+        tools:context=".MainActivity" />
+</LinearLayout>

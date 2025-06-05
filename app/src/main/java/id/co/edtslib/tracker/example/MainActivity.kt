@@ -7,13 +7,13 @@ import androidx.appcompat.app.AppCompatActivity
 import id.co.edtslib.edtsds.list.menu.MenuListView
 import id.co.edtslib.tracker.Tracker
 import id.co.edtslib.tracker.data.TrackerFilterDetail
+import id.co.edtslib.tracker.ui.TrackerInflateFactory
 
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        Tracker.trackClick("aaa")
         Tracker.checkInstallReferrer(this)
 
         val filter = mutableListOf<TrackerFilterDetail>()
@@ -49,4 +49,5 @@ class MainActivity : AppCompatActivity() {
             Tracker.trackSearch("lalali", "Login")
         }, 3000)
     }
+
 }

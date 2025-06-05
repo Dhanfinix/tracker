@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="TrackerAttrs">
+        <attr name="trackerClickLabel" format="string" />
+        <attr name="trackerClickCategory" format="string" />
+        <attr name="trackerClickTextEnabled" format="boolean" />
+    </declare-styleable>
+
+    <item name="tracker_click_label" type="id" />
+    <item name="tracker_click_category" type="id" />
+    <item name="tracker_click_details" type="id" />
+    <item name="tracker_click_text_enabled" type="id" />
+</resources>
