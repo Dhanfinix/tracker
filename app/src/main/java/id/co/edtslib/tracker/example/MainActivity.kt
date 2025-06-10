@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import androidx.appcompat.app.AppCompatActivity
+import id.co.edtslib.edtsds.list.menu.MenuDelegate
 import id.co.edtslib.edtsds.list.menu.MenuListView
 import id.co.edtslib.tracker.Tracker
 import id.co.edtslib.tracker.data.TrackerFilterDetail
@@ -33,21 +34,14 @@ class MainActivity : AppCompatActivity() {
 
         val menuListView = findViewById<MenuListView<String>>(R.id.menuListView)
         menuListView.data = list
-        Tracker.setImpressionRecyclerView<String?, String>("abah test", menuListView) { imp ->
-            return@setImpressionRecyclerView imp?.let { String.format("%s manipulated", it) } ?: "null"
+        menuListView.delegate = object : MenuDelegate<String> {
+            override fun onSelected(t: String) {
+                finish()
+            }
         }
 
-        Tracker.trackImpression<String, String>("", list)
-
     }
 
-    override fun onResume() {
-        super.onResume()
-        //Tracker.resumePage("testlib8", "testlibaja8")
-        Tracker.trackPage("testlib11", "testlib11", "testlib11")
-        Handler(Looper.myLooper()!!).postDelayed({
-            Tracker.trackSearch("lalali", "Login")
-        }, 3000)
-    }
+
 
 }

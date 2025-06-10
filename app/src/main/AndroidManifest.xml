@@ -1,8 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="id.co.edtslib.tracker.example">
+    package="id.co.edtslib.tracker.example"
+    xmlns:tools="http://schemas.android.com/tools">
     <uses-permission android:name="android.permission.INTERNET" />
-
+    <uses-sdk
+        android:minSdkVersion="21"
+        tools:overrideLibrary="androidx.security.ktx"/>
     <application
         android:name=".App"
         android:allowBackup="true"
@@ -19,6 +22,8 @@
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+            <meta-data android:name="trackerPageName" android:value="tracker Page SDK"/>
+            <meta-data android:name="trackerPageAvoid" android:value="false"/>
         </activity>
     </application>
 

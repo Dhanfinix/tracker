@@ -5,6 +5,8 @@ import android.app.Application
 import android.app.Application.ActivityLifecycleCallbacks
 import android.content.Intent
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import androidx.fragment.app.FragmentActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -25,6 +27,8 @@ import id.co.edtslib.tracker.di.sharedPreferencesModule
 import id.co.edtslib.tracker.di.viewModule
 import id.co.edtslib.tracker.ui.TrackerInflateFactory
 import id.co.edtslib.tracker.ui.TrackerInterceptor
+import id.co.edtslib.tracker.util.getMetaBoolean
+import id.co.edtslib.tracker.util.getMetaString
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.KoinApplication
 import org.koin.core.component.KoinComponent
@@ -33,13 +37,17 @@ import org.koin.core.context.startKoin
 import java.util.Date
 
 class Tracker private constructor() : KoinComponent {
-    private val trackerViewModel: TrackerViewModel? by inject()
-
     data class ImpressionData(
         val data: List<Any>,
         val time: Long
     )
 
+    data class PageData(
+        val name: String,
+        val id: String
+    )
+
+    private val trackerViewModel: TrackerViewModel? by inject()
     companion object {
         private var tracker: Tracker? = null
         var baseUrl = ""
@@ -50,10 +58,14 @@ class Tracker private constructor() : KoinComponent {
 
         private var firstImpression = -1
         private var lastImpression = -1
+        private val trackerPage = mutableMapOf<String, PageData>()
 
         // don't set manual, set with resume fun
         var currentPageName = ""
         var currentPageId = ""
+
+        private var isMinimized = false
+        private var isMinimizing = false
 
         fun init(application: Application, baseUrl: String, token: String) {
             Tracker.baseUrl = baseUrl
@@ -119,17 +131,65 @@ class Tracker private constructor() : KoinComponent {
                 }
 
                 override fun onActivityCreated(activity: Activity, savedInstanceState: Bundle?) {
+                    if (activity.isTaskRoot) {
+                        trackOpenApplication()
+                    }
+
+                    val trackerPageAvoid = activity.getMetaBoolean("trackerPageAvoid")
+                    if (trackerPageAvoid != true) {
+                        var pageName = activity.getMetaString("trackerPageName")
+                            ?: if (activity.title.toString().isNotEmpty() == true) {
+                                activity.title.toString()
+                            } else {
+                                activity.toString()
+                            }
+
+                        if (pageName.isNotEmpty() == true) {
+                            val pageData = PageData(
+                                name = pageName,
+                                id = "${pageName}_${Date().time}"
+                            )
+
+                            trackPage(
+                                activity = activity,
+                                pageName = pageData.name,
+                                pageId = pageData.id
+                            )
+                        }
+                    }
                     TrackerInterceptor.touchDispatch(activity)
                 }
 
                 override fun onActivityStarted(activity: Activity) {
+                    if (isMinimized) {
+                        trackResumeApplication()
+                    }
+                    isMinimized = false
+                    isMinimizing = false
                 }
 
                 override fun onActivityResumed(activity: Activity) {
-
+                    if (trackerPage.contains(getTrackerKey(activity))) {
+                        val pageData = trackerPage[getTrackerKey(activity)]
+                        resumePage(
+                            activity = activity,
+                            pageName = pageData?.name.toString(),
+                            pageId = pageData?.id.toString().toString(),
+                            force = false
+                        )
+                    }
                 }
 
                 override fun onActivityPaused(activity: Activity) {
+                    isMinimizing = true
+                    Handler(Looper.getMainLooper()).postDelayed(
+                        {
+                            if (isMinimizing) {
+                                trackMinimizeApplication()
+                                isMinimized = true
+                            }
+                        }, 2500
+                    )
                 }
 
                 override fun onActivityStopped(activity: Activity) {
@@ -139,12 +199,16 @@ class Tracker private constructor() : KoinComponent {
                 }
 
                 override fun onActivityDestroyed(activity: Activity) {
+                    if (activity.isTaskRoot) {
+                        trackCloseApplication()
+                    }
                 }
 
             })
         }
 
         fun getInstallReferer() = tracker?.trackerViewModel?.getInstallReferer()
+        fun getTrackerKey(activity: Activity) = activity::class.qualifiedName.toString()
 
         fun checkInstallReferrer(activity: FragmentActivity) {
             val referrerClient = InstallReferrerClient.newBuilder(activity).build()
@@ -214,13 +278,18 @@ class Tracker private constructor() : KoinComponent {
             tracker?.trackerViewModel?.setService(service)
         }
 
-        fun trackPage(pageName: String, pageId: String, pageUrlPath: String = "") {
+        fun trackPage(activity: Activity, pageName: String, pageId: String, pageUrlPath: String = "") {
             if (tracker == null) {
                 tracker = Tracker()
             }
 
             tracker?.trackerViewModel?.trackPage(pageName, pageId, pageUrlPath)
-            resumePage(pageName, pageId)
+            resumePage(
+                activity = activity,
+                pageName = pageName,
+                pageId = pageId,
+                force = true
+            )
         }
 
         fun trackPageDetail(detail: Any?) {
@@ -355,10 +424,26 @@ class Tracker private constructor() : KoinComponent {
             tracker?.trackerViewModel?.trackMinimizeApplication()
         }
 
-        fun resumePage(pageName: String, pageId: String) {
+        fun resumePage(activity: Activity, pageName: String, pageId: String) {
+            resumePage(
+                activity = activity,
+                pageName = pageName,
+                pageId = pageId,
+                force = true
+            )
+
+        }
+
+        private fun resumePage(activity: Activity, pageName: String, pageId: String, force: Boolean) {
             currentPageName = pageName
             currentPageId = pageId
 
+            if (force) {
+                trackerPage[getTrackerKey(activity)] = PageData(
+                    name = pageName,
+                    id = pageId
+                )
+            }
         }
 
         fun getData(): TrackerData? {
