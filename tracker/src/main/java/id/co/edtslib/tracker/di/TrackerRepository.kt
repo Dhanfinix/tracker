@@ -353,9 +353,13 @@ class TrackerRepository(
         val map = if (details is MutableMap<*, *>) {
             details.toMap()
         }
-        else {
-            null
-        }
+        else
+            if (details is MutableList<*>) {
+                details.toList()
+            }
+            else {
+                null
+            }
         val trackerCore = TrackerSubmissionCore.create(
             eventId = configurationLocalSource.getEventId(),
             label = name,
