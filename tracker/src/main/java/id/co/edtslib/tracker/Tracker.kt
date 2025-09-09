@@ -40,6 +40,7 @@ class Tracker private constructor() : KoinComponent {
         var baseUrl = ""
         var token = ""
         var path = "apps-tracker-gateway"
+        var isLegacy = false
         var debugging = false
         var resend = true
         var appVersion = "1.0.0"
@@ -51,10 +52,12 @@ class Tracker private constructor() : KoinComponent {
         var currentPageName = ""
         var currentPageId = ""
 
-        fun init(application: Application, baseUrl: String, token: String, path: String = "apps-tracker-gateway") {
+        fun init(application: Application, baseUrl: String, token: String, path: String = "apps-tracker-gateway", isLegacy: Boolean = false) {
             Tracker.baseUrl = baseUrl
             Tracker.token = token
             Tracker.path = path
+            Tracker.isLegacy = isLegacy
+
             startKoin {
                 androidContext(application.applicationContext)
                 modules(
@@ -74,10 +77,11 @@ class Tracker private constructor() : KoinComponent {
             }
         }
 
-        fun init(baseUrl: String, token: String, koin: KoinApplication, path: String = "apps-tracker-gateway") {
+        fun init(baseUrl: String, token: String, koin: KoinApplication, path: String = "apps-tracker-gateway", isLegacy: Boolean = false) {
             Tracker.baseUrl = baseUrl
             Tracker.token = token
             Tracker.path = path
+            Tracker.isLegacy = isLegacy
 
             koin.modules(
                 listOf(

@@ -84,7 +84,7 @@ private fun provideRetrofit(
 ): Retrofit {
     return Retrofit.Builder()
         .baseUrl(Tracker.baseUrl)
-        .client(okHttpClient.newBuilder().addInterceptor(AuthInterceptor(Tracker.token)).build())
+        .client(okHttpClient.newBuilder().addInterceptor(AuthInterceptor(Tracker.token, Tracker.isLegacy)).build())
         .addConverterFactory(converterFactory)
         .build()
 }
