@@ -39,7 +39,7 @@ class Tracker private constructor() : KoinComponent {
         private var tracker: Tracker? = null
         var baseUrl = ""
         var token = ""
-        var path = ""
+        var path = "apps-tracker-gateway"
         var debugging = false
         var resend = true
         var appVersion = "1.0.0"
@@ -170,7 +170,7 @@ class Tracker private constructor() : KoinComponent {
                 tracker = Tracker()
             }
 
-            tracker?.trackerViewModel?.trackPage(path, pageName, pageId, pageUrlPath)
+            tracker?.trackerViewModel?.trackPage(pageName, pageId, pageUrlPath)
             resumePage(pageName, pageId)
         }
 
@@ -179,7 +179,7 @@ class Tracker private constructor() : KoinComponent {
                 tracker = Tracker()
             }
 
-            tracker?.trackerViewModel?.trackPageDetail(path, detail)
+            tracker?.trackerViewModel?.trackPageDetail(detail)
         }
 
         fun trackClick(
@@ -192,7 +192,7 @@ class Tracker private constructor() : KoinComponent {
                 tracker = Tracker()
             }
 
-            tracker?.trackerViewModel?.trackClick(path, name, category, url, details)
+            tracker?.trackerViewModel?.trackClick(name, category, url, details)
         }
 
         fun trackFilters(filters: List<TrackerFilterDetail>, category: String = "") {
@@ -200,7 +200,7 @@ class Tracker private constructor() : KoinComponent {
                 tracker = Tracker()
             }
 
-            tracker?.trackerViewModel?.trackFilters(path, filters, category)
+            tracker?.trackerViewModel?.trackFilters(filters, category)
 
         }
 
@@ -209,7 +209,7 @@ class Tracker private constructor() : KoinComponent {
                 tracker = Tracker()
             }
 
-            tracker?.trackerViewModel?.trackSort(path, sortType)
+            tracker?.trackerViewModel?.trackSort(sortType)
         }
 
         fun trackSubmissionSuccess(name: String, category: String, details: Any? = null) {
@@ -217,7 +217,7 @@ class Tracker private constructor() : KoinComponent {
                 tracker = Tracker()
             }
 
-            tracker?.trackerViewModel?.trackSubmission(path, name, category, true, "", details)
+            tracker?.trackerViewModel?.trackSubmission(name, category, true, "", details)
 
         }
 
@@ -231,7 +231,7 @@ class Tracker private constructor() : KoinComponent {
                 tracker = Tracker()
             }
 
-            tracker?.trackerViewModel?.trackSubmission(path, name, category, false, reason, details)
+            tracker?.trackerViewModel?.trackSubmission(name, category, false, reason, details)
 
         }
 
@@ -244,7 +244,7 @@ class Tracker private constructor() : KoinComponent {
                 tracker = Tracker()
             }
 
-            tracker?.trackerViewModel?.trackImpression<S, T>(path, category, Date().time, data, mapper)
+            tracker?.trackerViewModel?.trackImpression<S, T>(category, Date().time, data, mapper)
         }
 
         fun <S, T> trackImpression(
@@ -257,7 +257,7 @@ class Tracker private constructor() : KoinComponent {
                 tracker = Tracker()
             }
 
-            tracker?.trackerViewModel?.trackImpression<S, T>(path, category, time, data, mapper)
+            tracker?.trackerViewModel?.trackImpression<S, T>(category, time, data, mapper)
         }
 
         fun trackDisplayedItems(data: MutableList<Any>) {
@@ -265,7 +265,7 @@ class Tracker private constructor() : KoinComponent {
                 tracker = Tracker()
             }
 
-            tracker?.trackerViewModel?.trackDisplayedItems(path, data)
+            tracker?.trackerViewModel?.trackDisplayedItems(data)
         }
 
         fun trackSearch(keyword: String, details: Any? = null) {
@@ -273,12 +273,12 @@ class Tracker private constructor() : KoinComponent {
                 tracker = Tracker()
             }
 
-            tracker?.trackerViewModel?.trackSearch(path, keyword, details)
+            tracker?.trackerViewModel?.trackSearch(keyword, details)
         }
 
         fun trackOpenApplication() {
             tracker?.trackerViewModel?.createSession()?.observeForever {
-                tracker?.trackerViewModel?.trackOpenApplication(path)
+                tracker?.trackerViewModel?.trackOpenApplication()
             }
         }
 
@@ -287,7 +287,7 @@ class Tracker private constructor() : KoinComponent {
                 tracker = Tracker()
             }
 
-            tracker?.trackerViewModel?.trackCloseApplication(path)
+            tracker?.trackerViewModel?.trackCloseApplication()
         }
 
         fun trackResumeApplication() {
@@ -295,7 +295,7 @@ class Tracker private constructor() : KoinComponent {
                 tracker = Tracker()
             }
 
-            tracker?.trackerViewModel?.trackResumeApplication(path)
+            tracker?.trackerViewModel?.trackResumeApplication()
         }
 
         fun trackMinimizeApplication() {
@@ -303,7 +303,7 @@ class Tracker private constructor() : KoinComponent {
                 tracker = Tracker()
             }
 
-            tracker?.trackerViewModel?.trackMinimizeApplication(path)
+            tracker?.trackerViewModel?.trackMinimizeApplication()
         }
 
         fun resumePage(pageName: String, pageId: String) {

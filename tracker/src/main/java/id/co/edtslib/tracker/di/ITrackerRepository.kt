@@ -17,20 +17,20 @@ interface ITrackerRepository {
     fun setService(service: String): Flow<Boolean>
     fun getService(): String?
 
-    fun trackApplication(path: String, eventName: String): Flow<Boolean>
+    fun trackApplication(eventName: String): Flow<Boolean>
 
-    fun trackPage(path: String, pageName: String, pageId: String, pageUrlPath: String): Flow<TrackerResponse>
-    fun trackPageDetail(path: String, detail: Any?): Flow<TrackerResponse>
+    fun trackPage(pageName: String, pageId: String, pageUrlPath: String): Flow<TrackerResponse>
+    fun trackPageDetail(detail: Any?): Flow<TrackerResponse>
 
-    fun trackClick(path: String, name: String, category: String? = null, url: String? = null, details: Any? = null): Flow<TrackerResponse>
-    fun trackFilters(path: String, filters: List<TrackerFilterDetail>, category: String = ""): Flow<TrackerResponse>
-    fun trackSort(path: String, sortType: String): Flow<TrackerResponse>
+    fun trackClick(name: String, category: String? = null, url: String? = null, details: Any? = null): Flow<TrackerResponse>
+    fun trackFilters(filters: List<TrackerFilterDetail>, category: String = ""): Flow<TrackerResponse>
+    fun trackSort(sortType: String): Flow<TrackerResponse>
 
-    fun <S, T> trackImpression(path: String, category: String, time: Long, data: List<*>, mapper: ((data: S) -> T)? = null): Flow<TrackerResponse>
-    fun trackSubmission(path: String, name: String, category: String, status: Boolean, reason: String?, details: Any? = null): Flow<TrackerResponse>
+    fun <S, T> trackImpression(category: String, time: Long, data: List<*>, mapper: ((data: S) -> T)? = null): Flow<TrackerResponse>
+    fun trackSubmission(name: String, category: String, status: Boolean, reason: String?, details: Any? = null): Flow<TrackerResponse>
 
-    fun trackDisplayedItems(path: String, data: MutableList<Any>): Flow<TrackerResponse>
-    fun trackSearch(path: String, keyword: String, details: Any? = null): Flow<TrackerResponse>
+    fun trackDisplayedItems(data: MutableList<Any>): Flow<TrackerResponse>
+    fun trackSearch(keyword: String, details: Any? = null): Flow<TrackerResponse>
 
     fun getData(): TrackerData
 }

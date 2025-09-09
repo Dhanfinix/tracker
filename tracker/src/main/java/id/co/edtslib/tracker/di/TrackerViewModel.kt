@@ -42,44 +42,43 @@ open class TrackerViewModel(
 
     fun getService() = trackerUseCase.getService()
 
-    fun trackOpenApplication(path: String) {
+    fun trackOpenApplication() {
         viewModelScope.launch(Dispatchers.IO) {
-            trackerUseCase.trackApplication(path, "open_app").collect()
+            trackerUseCase.trackApplication("open_app").collect()
         }
     }
 
-    fun trackResumeApplication(path: String) {
+    fun trackResumeApplication() {
         viewModelScope.launch(Dispatchers.IO) {
-            trackerUseCase.trackApplication(path, "resume_app").collect()
+            trackerUseCase.trackApplication("resume_app").collect()
         }
     }
 
-    fun trackMinimizeApplication(path: String) {
+    fun trackMinimizeApplication() {
         viewModelScope.launch(Dispatchers.IO) {
-            trackerUseCase.trackApplication(path, "minimize_app").collect()
+            trackerUseCase.trackApplication("minimize_app").collect()
         }
     }
 
-    fun trackCloseApplication(path: String) {
+    fun trackCloseApplication() {
         viewModelScope.launch(Dispatchers.IO) {
-            trackerUseCase.trackApplication(path, "close_app").collect()
+            trackerUseCase.trackApplication("close_app").collect()
         }
     }
 
-    fun trackPage(path: String, pageName: String, pageId: String, pageUrlPath: String) {
+    fun trackPage(pageName: String, pageId: String, pageUrlPath: String) {
         viewModelScope.launch(Dispatchers.IO) {
-            trackerUseCase.trackPage(path, pageName, pageId, pageUrlPath).collect()
+            trackerUseCase.trackPage(pageName, pageId, pageUrlPath).collect()
         }
     }
 
-    fun trackPageDetail(path: String, detail: Any?) {
+    fun trackPageDetail(detail: Any?) {
         viewModelScope.launch(Dispatchers.IO) {
-            trackerUseCase.trackPageDetail(path, detail).collect()
+            trackerUseCase.trackPageDetail(detail).collect()
         }
     }
 
     fun trackClick(
-        path: String,
         name: String,
         category: String? = null,
         url: String? = null,
@@ -87,7 +86,7 @@ open class TrackerViewModel(
     ) {
         viewModelScope.launch(Dispatchers.IO) {
             try {
-                trackerUseCase.trackClick(path, name, category, url, details).collect()
+                trackerUseCase.trackClick(name, category, url, details).collect()
             }
             catch (_: Error) {
 
@@ -95,20 +94,19 @@ open class TrackerViewModel(
         }
     }
 
-    fun trackFilters(path: String, filters: List<TrackerFilterDetail>, category: String = "") {
+    fun trackFilters(filters: List<TrackerFilterDetail>, category: String = "") {
         viewModelScope.launch(Dispatchers.IO) {
-            trackerUseCase.trackFilters(path, filters, category).collect()
+            trackerUseCase.trackFilters(filters, category).collect()
         }
     }
 
-    fun trackSort(path: String, sortType: String) {
+    fun trackSort(sortType: String) {
         viewModelScope.launch(Dispatchers.IO) {
-            trackerUseCase.trackSort(path, sortType).collect()
+            trackerUseCase.trackSort(sortType).collect()
         }
     }
 
     fun trackSubmission(
-        path: String,
         name: String,
         category: String,
         status: Boolean,
@@ -116,31 +114,30 @@ open class TrackerViewModel(
         details: Any? = null
     ) {
         viewModelScope.launch(Dispatchers.IO) {
-            trackerUseCase.trackSubmission(path, name, category, status, reason, details).collect()
+            trackerUseCase.trackSubmission(name, category, status, reason, details).collect()
         }
     }
 
     fun <S, T> trackImpression(
-        path: String,
         category: String,
         time: Long,
         data: List<*>,
         mapper: ((data: S) -> T)? = null
     ) {
         viewModelScope.launch(Dispatchers.IO) {
-            trackerUseCase.trackImpression<S, T>(path, category, time, data, mapper).collect()
+            trackerUseCase.trackImpression<S, T>(category, time, data, mapper).collect()
         }
     }
 
-    fun trackDisplayedItems(path: String, data: MutableList<Any>) {
+    fun trackDisplayedItems(data: MutableList<Any>) {
         viewModelScope.launch(Dispatchers.IO) {
-            trackerUseCase.trackDisplayedItems(path, data).collect()
+            trackerUseCase.trackDisplayedItems(data).collect()
         }
     }
 
-    fun trackSearch(path: String, keyword: String, details: Any? = null) {
+    fun trackSearch(keyword: String, details: Any? = null) {
         viewModelScope.launch(Dispatchers.IO) {
-            trackerUseCase.trackSearch(path, keyword, details).collect()
+            trackerUseCase.trackSearch(keyword, details).collect()
         }
     }
 
