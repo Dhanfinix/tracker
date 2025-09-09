@@ -4,7 +4,7 @@ class TrackerRemoteDataSource(
     private val trackerApiService: TrackerApiService
 ) : BaseDataSource() {
 
-    suspend fun send(trackers: TrackerDataList) =
-        getResult { trackerApiService.sendTracks(trackers) }
+    suspend fun send(path: String, trackers: TrackerDataList) =
+        getResult { trackerApiService.sendTracks(path, trackers) }
 
 }

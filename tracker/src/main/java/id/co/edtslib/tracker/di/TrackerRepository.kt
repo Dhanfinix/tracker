@@ -89,7 +89,7 @@ class TrackerRepository(
         return configurationLocalSource.getService()
     }
 
-    override fun trackApplication(eventName: String) = flow {
+    override fun trackApplication(path: String, eventName: String) = flow {
         val trackerCore = TrackerActivityCore.createPageActivity(
             eventId = configurationLocalSource.getEventId(),
             eventName = eventName,
@@ -106,7 +106,7 @@ class TrackerRepository(
 
         val trackerDataList = TrackerDataList(mutableListOf(trackerData))
 
-        val response = remoteSource.send(trackerDataList)
+        val response = remoteSource.send(path, trackerDataList)
         when(response.status) {
             Result.Status.SUCCESS -> {}
             Result.Status.ERROR, Result.Status.UNAUTHORIZED -> {
@@ -133,7 +133,7 @@ class TrackerRepository(
             network = network)
     }
 
-    override fun trackPage(pageName: String, pageId: String, pageUrlPath: String) = flow {
+    override fun trackPage(path: String, pageName: String, pageId: String, pageUrlPath: String) = flow {
         val previousPageName = configurationLocalSource.getPreviousPageName()
         val prevPageUrlPath = configurationLocalSource.getPrevPageUrlPath()
         val service = configurationLocalSource.getService()
@@ -159,7 +159,7 @@ class TrackerRepository(
 
         val trackerDataList = TrackerDataList(mutableListOf(trackerData))
 
-        val response = remoteSource.send(trackerDataList)
+        val response = remoteSource.send(path, trackerDataList)
 
         configurationLocalSource.setPreviousPageName(pageName)
         configurationLocalSource.setPrevPageUrlPath(pageUrlPath)
@@ -182,7 +182,7 @@ class TrackerRepository(
         }
     }
 
-    override fun trackPageDetail(detail: Any?) = flow {
+    override fun trackPageDetail(path: String, detail: Any?) = flow {
         val trackerCore = TrackerPageDetailCore.create(
             eventId = configurationLocalSource.getEventId(),
             details = detail,
@@ -198,7 +198,7 @@ class TrackerRepository(
 
         val trackerDataList = TrackerDataList(mutableListOf(trackerData))
 
-        val response = remoteSource.send(trackerDataList)
+        val response = remoteSource.send(path, trackerDataList)
         when(response.status) {
             Result.Status.SUCCESS -> emit(TrackerResponse(Gson().toJson(trackerData), response.data))
             Result.Status.ERROR, Result.Status.UNAUTHORIZED -> {
@@ -211,7 +211,7 @@ class TrackerRepository(
         }
     }
 
-    override fun trackClick(name: String, category: String?, url: String?, details: Any?) = flow {
+    override fun trackClick(path: String, name: String, category: String?, url: String?, details: Any?) = flow {
         val prevService = configurationLocalSource.getService()
         val trackerCore = TrackerClickLinkCore.create(
             eventId = configurationLocalSource.getEventId(),
@@ -231,7 +231,7 @@ class TrackerRepository(
 
         val trackerDataList = TrackerDataList(mutableListOf(trackerData))
 
-        val response = remoteSource.send(trackerDataList)
+        val response = remoteSource.send(path, trackerDataList)
         when(response.status) {
             Result.Status.SUCCESS -> emit(TrackerResponse(Gson().toJson(trackerData), response.data))
             Result.Status.ERROR, Result.Status.UNAUTHORIZED -> {
@@ -244,7 +244,7 @@ class TrackerRepository(
         }
     }
 
-    override fun trackFilters(filters: List<TrackerFilterDetail>, category: String) = flow {
+    override fun trackFilters(path: String, filters: List<TrackerFilterDetail>, category: String) = flow {
         val trackerCore = TrackerFilterCore.create(
             eventId = configurationLocalSource.getEventId(),
             list = filters,
@@ -261,7 +261,7 @@ class TrackerRepository(
 
         val trackerDataList = TrackerDataList(mutableListOf(trackerData))
 
-        val response = remoteSource.send(trackerDataList)
+        val response = remoteSource.send(path, trackerDataList)
         when(response.status) {
             Result.Status.SUCCESS -> emit(TrackerResponse(Gson().toJson(trackerData), response.data))
             Result.Status.ERROR, Result.Status.UNAUTHORIZED -> {
@@ -274,7 +274,7 @@ class TrackerRepository(
         }
     }
 
-    override fun trackSort(sortType: String) = flow {
+    override fun trackSort(path: String, sortType: String) = flow {
         val trackerCore = TrackerSortCore.create(
             eventId = configurationLocalSource.getEventId(),
             sortType = sortType,
@@ -290,7 +290,7 @@ class TrackerRepository(
 
         val trackerDataList = TrackerDataList(mutableListOf(trackerData))
 
-        val response = remoteSource.send(trackerDataList)
+        val response = remoteSource.send(path, trackerDataList)
         when(response.status) {
             Result.Status.SUCCESS -> emit(TrackerResponse(Gson().toJson(trackerData), response.data))
             Result.Status.ERROR, Result.Status.UNAUTHORIZED -> {
@@ -303,7 +303,7 @@ class TrackerRepository(
         }
     }
 
-    override fun <S, T> trackImpression(category: String, time: Long, data: List<*>, mapper: ((data: S) -> T)?) = flow {
+    override fun <S, T> trackImpression(path: String, category: String, time: Long, data: List<*>, mapper: ((data: S) -> T)?) = flow {
         val mappedData = mutableListOf<T>()
         if (mapper != null) {
             for (d in data) {
@@ -330,7 +330,7 @@ class TrackerRepository(
 
         val trackerDataList = TrackerDataList(mutableListOf(trackerData))
 
-        val response = remoteSource.send(trackerDataList)
+        val response = remoteSource.send(path, trackerDataList)
         when(response.status) {
             Result.Status.SUCCESS -> emit(TrackerResponse(Gson().toJson(trackerData), response.data))
             Result.Status.ERROR, Result.Status.UNAUTHORIZED -> {
@@ -344,6 +344,7 @@ class TrackerRepository(
     }
 
     override fun trackSubmission(
+        path: String,
         name: String,
         category: String,
         status: Boolean,
@@ -380,7 +381,7 @@ class TrackerRepository(
         val trackerDataList = TrackerDataList(mutableListOf(trackerData))
 
         try {
-            val response = remoteSource.send(trackerDataList)
+            val response = remoteSource.send(path, trackerDataList)
             when(response.status) {
                 Result.Status.SUCCESS -> emit(TrackerResponse(Gson().toJson(trackerData), response.data))
                 Result.Status.ERROR, Result.Status.UNAUTHORIZED -> {
@@ -399,6 +400,7 @@ class TrackerRepository(
     }
 
     override fun trackDisplayedItems(
+        path: String,
         data: MutableList<Any>
     ) = flow {
         val trackerCore = TrackerDisplayedItemCore.create(
@@ -416,7 +418,7 @@ class TrackerRepository(
 
         val trackerDataList = TrackerDataList(mutableListOf(trackerData))
 
-        val response = remoteSource.send(trackerDataList)
+        val response = remoteSource.send(path, trackerDataList)
         when(response.status) {
             Result.Status.SUCCESS -> emit(TrackerResponse(Gson().toJson(trackerData), response.data))
             Result.Status.ERROR, Result.Status.UNAUTHORIZED -> {
@@ -430,6 +432,7 @@ class TrackerRepository(
     }
 
     override fun trackSearch(
+        path: String,
         keyword: String,
         details: Any?
     ) = flow {
@@ -449,7 +452,7 @@ class TrackerRepository(
 
         val trackerDataList = TrackerDataList(mutableListOf(trackerData))
 
-        val response = remoteSource.send(trackerDataList)
+        val response = remoteSource.send(path, trackerDataList)
         when(response.status) {
             Result.Status.SUCCESS -> emit(TrackerResponse(Gson().toJson(trackerData), response.data))
             Result.Status.ERROR, Result.Status.UNAUTHORIZED -> {

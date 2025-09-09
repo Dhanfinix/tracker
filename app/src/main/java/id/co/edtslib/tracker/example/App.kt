@@ -9,8 +9,11 @@ class App: Application() {
 
         Tracker.appVersion = "1.0.0"
         Tracker.debugging = true
-        Tracker.init(this, "https://us-central1-idm-klik-dwh-apollo-dev.cloudfunctions.net/klikidm_apollo_apps_tracker_gateway/",
-            "AIzaSyCOi2whcq-BY-93oJKmuj5cGLMm9PXyciQ")
+        Tracker.init(
+            this,
+            "https://us-central1-idm-klik-dwh-apollo-dev.cloudfunctions.net/klikidm_apollo_apps_tracker_gateway/",
+            "AIzaSyCOi2whcq-BY-93oJKmuj5cGLMm9PXyciQ"
+        )
 
     }
 }

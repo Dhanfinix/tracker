@@ -16,40 +16,42 @@ class TrackerInteractor(private val repository: ITrackerRepository) : TrackerUse
     override fun setService(service: String) = repository.setService(service)
     override fun getService() = repository.getService()
 
-    override fun trackApplication(eventName: String) = repository.trackApplication(eventName)
+    override fun trackApplication(path: String, eventName: String) = repository.trackApplication(path, eventName)
 
-    override fun trackPage(pageName: String, pageId: String, pageUrlPath: String) =
-        repository.trackPage(pageName, pageId, pageUrlPath)
+    override fun trackPage(path: String, pageName: String, pageId: String, pageUrlPath: String) =
+        repository.trackPage(path, pageName, pageId, pageUrlPath)
 
-    override fun trackPageDetail(detail: Any?) = repository.trackPageDetail(detail)
+    override fun trackPageDetail(path: String, detail: Any?) = repository.trackPageDetail(path, detail)
 
-    override fun trackClick(name: String, category: String?, url: String?, details: Any?) =
-        repository.trackClick(name, category, url, details)
+    override fun trackClick(path: String, name: String, category: String?, url: String?, details: Any?) =
+        repository.trackClick(path, name, category, url, details)
 
-    override fun trackFilters(filters: List<TrackerFilterDetail>, category: String) =
-        repository.trackFilters(filters, category)
+    override fun trackFilters(path: String, filters: List<TrackerFilterDetail>, category: String) =
+        repository.trackFilters(path, filters, category)
 
-    override fun trackSort(sortType: String) = repository.trackSort(sortType)
+    override fun trackSort(path: String, sortType: String) = repository.trackSort(path, sortType)
 
     override fun <S, T> trackImpression(
+        path: String,
         category: String,
         time: Long,
         data: List<*>,
         mapper: ((data: S) -> T)?
-    ) = repository.trackImpression<S, T>(category, time, data, mapper)
+    ) = repository.trackImpression<S, T>(path, category, time, data, mapper)
 
     override fun trackSubmission(
+        path: String,
         name: String,
         category: String,
         status: Boolean,
         reason: String?,
         details: Any?
     ) =
-        repository.trackSubmission(name, category, status, reason, details)
+        repository.trackSubmission(path, name, category, status, reason, details)
 
-    override fun trackDisplayedItems(data: MutableList<Any>) = repository.trackDisplayedItems(data)
-    override fun trackSearch(keyword: String, details: Any?) =
-        repository.trackSearch(keyword, details)
+    override fun trackDisplayedItems(path: String, data: MutableList<Any>) = repository.trackDisplayedItems(path, data)
+    override fun trackSearch(path: String, keyword: String, details: Any?) =
+        repository.trackSearch(path, keyword, details)
 
     override fun getData() = repository.getData()
 }
