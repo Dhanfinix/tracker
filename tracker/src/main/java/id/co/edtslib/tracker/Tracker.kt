@@ -37,6 +37,7 @@ class Tracker private constructor() : KoinComponent {
 
     companion object {
         private var tracker: Tracker? = null
+        var isInitialized: Boolean = false
         var baseUrl = ""
         var token = ""
         var path = "apps-tracker-gateway"
@@ -51,6 +52,12 @@ class Tracker private constructor() : KoinComponent {
         // don't set manual, set with resume fun
         var currentPageName = ""
         var currentPageId = ""
+
+        private fun checkInitialization(functionName: String) {
+            if (!isInitialized && debugging) {
+                android.util.Log.w("Tracker", "$functionName called before init()")
+            }
+        }
 
         fun init(application: Application, baseUrl: String, token: String, path: String = "apps-tracker-gateway", isLegacy: Boolean = false) {
             Tracker.baseUrl = baseUrl
@@ -72,9 +79,8 @@ class Tracker private constructor() : KoinComponent {
                 )
             }
 
-            if (tracker == null) {
-                tracker = Tracker()
-            }
+            tracker = Tracker()
+            isInitialized = true
         }
 
         fun init(baseUrl: String, token: String, koin: KoinApplication, path: String = "apps-tracker-gateway", isLegacy: Boolean = false) {
@@ -94,9 +100,8 @@ class Tracker private constructor() : KoinComponent {
                 )
             )
 
-            if (tracker == null) {
-                tracker = Tracker()
-            }
+            tracker = Tracker()
+            isInitialized = true
         }
 
         fun getInstallReferer() = tracker?.trackerViewModel?.getInstallReferer()
@@ -136,53 +141,39 @@ class Tracker private constructor() : KoinComponent {
         }
 
         fun checkInstallReferrer(utm_raw: String?, intent: Intent?) {
+            checkInitialization("checkInstallReferrer")
             if (intent?.data?.getQueryParameter("utm_source") != null) {
                 tracker?.trackerViewModel?.setInstallReferer(InstallReferer(intent.data?.toString()))
             } else {
-
                 tracker?.trackerViewModel?.setInstallReferer(InstallReferer(utm_raw))
             }
         }
 
         fun setUserId(userId: Long) {
-            if (tracker == null) {
-                tracker = Tracker()
-            }
-
+            checkInitialization("setUserId")
             tracker?.trackerViewModel?.setUserId(userId)
         }
 
         fun setLatLng(lat: Double, lng: Double) {
-            if (tracker == null) {
-                tracker = Tracker()
-            }
-
+            checkInitialization("setLatLng")
             tracker?.trackerViewModel?.setLatLng(lat, lng)
         }
 
         fun getService() = tracker?.trackerViewModel?.getService()
-        fun setService(service: String) {
-            if (tracker == null) {
-                tracker = Tracker()
-            }
 
+        fun setService(service: String) {
+            checkInitialization("setService")
             tracker?.trackerViewModel?.setService(service)
         }
 
         fun trackPage(pageName: String, pageId: String, pageUrlPath: String = "") {
-            if (tracker == null) {
-                tracker = Tracker()
-            }
-
+            checkInitialization("trackPage")
             tracker?.trackerViewModel?.trackPage(pageName, pageId, pageUrlPath)
             resumePage(pageName, pageId)
         }
 
         fun trackPageDetail(detail: Any?) {
-            if (tracker == null) {
-                tracker = Tracker()
-            }
-
+            checkInitialization("trackPageDetail")
             tracker?.trackerViewModel?.trackPageDetail(detail)
         }
 
@@ -192,37 +183,23 @@ class Tracker private constructor() : KoinComponent {
             url: String? = null,
             details: Any? = null
         ) {
-            if (tracker == null) {
-                tracker = Tracker()
-            }
-
+            checkInitialization("trackClick")
             tracker?.trackerViewModel?.trackClick(name, category, url, details)
         }
 
         fun trackFilters(filters: List<TrackerFilterDetail>, category: String = "") {
-            if (tracker == null) {
-                tracker = Tracker()
-            }
-
+            checkInitialization("trackFilters")
             tracker?.trackerViewModel?.trackFilters(filters, category)
-
         }
 
         fun trackSort(sortType: String) {
-            if (tracker == null) {
-                tracker = Tracker()
-            }
-
+            checkInitialization("trackSort")
             tracker?.trackerViewModel?.trackSort(sortType)
         }
 
         fun trackSubmissionSuccess(name: String, category: String, details: Any? = null) {
-            if (tracker == null) {
-                tracker = Tracker()
-            }
-
+            checkInitialization("trackSubmissionSuccess")
             tracker?.trackerViewModel?.trackSubmission(name, category, true, "", details)
-
         }
 
         fun trackSubmissionFailed(
@@ -231,12 +208,8 @@ class Tracker private constructor() : KoinComponent {
             reason: String?,
             details: Any? = null
         ) {
-            if (tracker == null) {
-                tracker = Tracker()
-            }
-
+            checkInitialization("trackSubmissionFailed")
             tracker?.trackerViewModel?.trackSubmission(name, category, false, reason, details)
-
         }
 
         fun <S, T> trackImpression(
@@ -244,10 +217,7 @@ class Tracker private constructor() : KoinComponent {
             data: List<*>,
             mapper: ((data: S) -> T)? = null
         ) {
-            if (tracker == null) {
-                tracker = Tracker()
-            }
-
+            checkInitialization("trackImpression")
             tracker?.trackerViewModel?.trackImpression<S, T>(category, Date().time, data, mapper)
         }
 
@@ -257,72 +227,48 @@ class Tracker private constructor() : KoinComponent {
             data: List<*>,
             mapper: ((data: S) -> T)? = null
         ) {
-            if (tracker == null) {
-                tracker = Tracker()
-            }
-
+            checkInitialization("trackImpression")
             tracker?.trackerViewModel?.trackImpression<S, T>(category, time, data, mapper)
         }
 
         fun trackDisplayedItems(data: MutableList<Any>) {
-            if (tracker == null) {
-                tracker = Tracker()
-            }
-
+            checkInitialization("trackDisplayedItems")
             tracker?.trackerViewModel?.trackDisplayedItems(data)
         }
 
         fun trackSearch(keyword: String, details: Any? = null) {
-            if (tracker == null) {
-                tracker = Tracker()
-            }
-
+            checkInitialization("trackSearch")
             tracker?.trackerViewModel?.trackSearch(keyword, details)
         }
 
         fun trackOpenApplication() {
+            checkInitialization("trackOpenApplication")
             tracker?.trackerViewModel?.createSession()?.observeForever {
                 tracker?.trackerViewModel?.trackOpenApplication()
             }
         }
 
         fun trackCloseApplication() {
-            if (tracker == null) {
-                tracker = Tracker()
-            }
-
+            checkInitialization("trackCloseApplication")
             tracker?.trackerViewModel?.trackCloseApplication()
         }
 
         fun trackResumeApplication() {
-            if (tracker == null) {
-                tracker = Tracker()
-            }
-
+            checkInitialization("trackResumeApplication")
             tracker?.trackerViewModel?.trackResumeApplication()
         }
 
         fun trackMinimizeApplication() {
-            if (tracker == null) {
-                tracker = Tracker()
-            }
-
+            checkInitialization("trackMinimizeApplication")
             tracker?.trackerViewModel?.trackMinimizeApplication()
         }
 
         fun resumePage(pageName: String, pageId: String) {
             currentPageName = pageName
             currentPageId = pageId
-
         }
 
-        fun getData(): TrackerData? {
-            if (tracker == null) {
-                tracker = Tracker()
-            }
-
-            return tracker?.trackerViewModel?.getData()
-        }
+        fun getData(): TrackerData? = tracker?.trackerViewModel?.getData()
 
         fun <S, T> setImpressionRecyclerView(
             category: String,
@@ -350,7 +296,6 @@ class Tracker private constructor() : KoinComponent {
                                         )
                                     }
                                 }
-
                             }
                         }
                         recyclerView.tag = null
@@ -375,12 +320,9 @@ class Tracker private constructor() : KoinComponent {
                             last = layoutManager.findLastVisibleItemPositions(null)[0]
                         }
 
-
                         if (firstImpression != first && lastImpression != last) {
-
                             firstImpression = first
                             lastImpression = last
-
 
                             if (recyclerView.adapter is BaseRecyclerViewAdapter<*, *>) {
                                 addImpression(
@@ -389,15 +331,14 @@ class Tracker private constructor() : KoinComponent {
                                     last,
                                     recyclerView.adapter as BaseRecyclerViewAdapter<*, *>
                                 )
-                            } else
-                                if (recyclerView.adapter is BaseRecyclerView2) {
-                                    addImpression(
-                                        recyclerView,
-                                        first,
-                                        last,
-                                        recyclerView.adapter as BaseRecyclerView2
-                                    )
-                                }
+                            } else if (recyclerView.adapter is BaseRecyclerView2) {
+                                addImpression(
+                                    recyclerView,
+                                    first,
+                                    last,
+                                    recyclerView.adapter as BaseRecyclerView2
+                                )
+                            }
                         }
                     }
                 }
@@ -425,14 +366,11 @@ class Tracker private constructor() : KoinComponent {
             val newData = ImpressionData(data = l, time = Date().time)
             if (recyclerView.tag == null) {
                 recyclerView.tag = listOf(newData)
-            } else
-                if (recyclerView.tag is List<*>) {
-                    val list = (recyclerView.tag as List<ImpressionData>).toMutableList()
-                    list.add(newData)
-
-                    recyclerView.tag = list
-
-                }
+            } else if (recyclerView.tag is List<*>) {
+                val list = (recyclerView.tag as List<ImpressionData>).toMutableList()
+                list.add(newData)
+                recyclerView.tag = list
+            }
         }
 
         private fun addImpression(
@@ -456,15 +394,11 @@ class Tracker private constructor() : KoinComponent {
             val newData = ImpressionData(data = l, time = Date().time)
             if (recyclerView.tag == null) {
                 recyclerView.tag = listOf(newData)
-            } else
-                if (recyclerView.tag is List<*>) {
-                    val list = (recyclerView.tag as List<ImpressionData>).toMutableList()
-                    list.add(newData)
-
-                    recyclerView.tag = list
-
-                }
+            } else if (recyclerView.tag is List<*>) {
+                val list = (recyclerView.tag as List<ImpressionData>).toMutableList()
+                list.add(newData)
+                recyclerView.tag = list
+            }
         }
     }
-
 }
