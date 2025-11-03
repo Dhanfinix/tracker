@@ -4,22 +4,50 @@ plugins {
     id 'maven-publish'
 }
 
-group = 'id.co.edtslib'
-version = '2,0,0'
+// Load GitHub properties file
+def githubProperties = new Properties()
+githubProperties.load(new FileInputStream(rootProject.file("github.properties")))
+
+/** Function to retrieve version name
+ * First part is the base version from toni-kustiana/tracker
+ * Second part is this library's version
+ */
+def getVersionName = { ->
+    return "2.3.20-1" // Replace with version name
+}
+
+// Function to retrieve artifact ID
+def getMyArtifactId = { ->
+    return "tracker" // Replace with library name ID
+}
 
 afterEvaluate {
     publishing {
         publications {
-            // Creates a Maven publication called "release".
-            release(MavenPublication) {
-                from components.release
-                groupId = 'id.co.edtslib'
-                artifactId = 'tracker'
-                version = '2.0.0'
+            bar(MavenPublication) {
+                groupId = "id.co.edtslib" // Replace with group ID
+                artifactId = getMyArtifactId()
+                version = getVersionName()
+                artifact("$buildDir/outputs/aar/${getMyArtifactId()}-release.aar")
+            }
+        }
+
+        repositories {
+            maven {
+                name = "GitHubPackages"
+                // Configure the URL of your package repository on GitHub
+                url = uri("https://maven.pkg.github.com/Dhanfinix/tracker") // Replace with GitHub details
+
+                credentials {
+                    // Use GitHub properties or environment variables for credentials
+                    username = githubProperties['USER_ID'] ?: System.getenv("USER_ID")
+                    password = githubProperties['ACCESS_TOKEN'] ?: System.getenv("ACCESS_TOKEN")
+                }
             }
         }
     }
 }
+
 android {
     compileSdk 33
 
