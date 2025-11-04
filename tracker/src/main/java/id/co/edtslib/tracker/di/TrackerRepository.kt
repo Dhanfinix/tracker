@@ -5,8 +5,9 @@ import id.co.edtslib.tracker.Tracker
 import id.co.edtslib.tracker.data.*
 import kotlinx.coroutines.flow.flow
 import java.util.*
+import javax.inject.Inject
 
-class TrackerRepository(
+class TrackerRepository @Inject constructor(
     private val remoteSource: TrackerRemoteDataSource,
     private val localSource: TrackerLocalDataSource,
     private val configurationLocalSource: ConfigurationLocalSource

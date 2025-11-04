@@ -7,7 +7,6 @@ import android.os.Build
 import android.provider.Settings
 import com.google.gson.annotations.SerializedName
 import id.co.edtslib.tracker.R
-import id.co.edtslib.tracker.Tracker
 import java.util.*
 
 data class TrackerApps (
@@ -31,7 +30,10 @@ data class TrackerApps (
 ) {
     companion object {
         @SuppressLint("HardwareIds")
-        fun create(context: Context?) : TrackerApps {
+        fun create(
+            context: Context?,
+            appVersion: String
+        ) : TrackerApps {
             val fields = Build.VERSION_CODES::class.java.fields
 
             var osName = "Android UNKNOWN"
@@ -57,7 +59,7 @@ data class TrackerApps (
                 osVersion = osCode,
                 deviceClassName = className,
                 deviceFamilyName = familyName,
-                appVersion = Tracker.appVersion,
+                appVersion = appVersion,
                 deviceId = deviceID,
                 sourceName = "apps",
                 osTimeZone = TimeZone.getDefault().id)
