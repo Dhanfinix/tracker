@@ -19,34 +19,59 @@ dependencies {
 }
 ```
 
-### Usage
+### Usage with Hilt
+1. Application Setup
+   Create an Application class and annotate it with @HiltAndroidApp. Register it in your AndroidManifest.xml:
 
-- Create Class extend Application, and add to manifest android:name.
+```kotlin
+@HiltAndroidApp
+class App : Application()
+```
 ```xml
 <application
-    android:name=".App">
+android:name=".App">
 </application>
 ```
 
-- On application oncreate, Initialize the tracker with call Tracker.init()
-
+2. Provide TrackerConfig via Hilt
+   In your app module, create a Hilt module to supply runtime configuration:
 ```kotlin
-class App: Application() {
-    override fun onCreate() {
-        super.onCreate()
+@Module
+@InstallIn(SingletonComponent::class)
+object TrackerInitModule {
 
-        Tracker.init(this,"https://asia-southeast2-idm-corp-dev.cloudfunctions.net",
-            "fT2vJnJu4dsxTRMphdHE3Z92uwjaBRztGR3ECdRQTEyDDZJGbvGu")
+    @Provides
+    @Singleton
+    fun provideTrackerConfig(): TrackerConfig {
+        return TrackerConfig(
+            baseUrl = "https://your-api.com/tracker/",
+            token = "your-api-token",
+            path = "apps-tracker-gateway",
+            isLegacy = false,
+            resend = true,
+            debugging = BuildConfig.DEBUG,
+            appVersion = BuildConfig.VERSION_NAME
+        )
+    }
+}
+```
+3. Inject and Use Tracker
+   Once configured, you can inject Tracker into any Hilt-aware class:
+```kotlin
+@AndroidEntryPoint
+class MainActivity : AppCompatActivity() {
+
+    @Inject lateinit var tracker: Tracker
+
+    override fun onResume() {
+        super.onResume()
+        tracker.resumePage()
     }
 }
 ```
 
-if you're already using Koin on your application, you can call init on your application using this method
-```kotlin
-fun init(baseUrl: String, token: String, koin: KoinApplication) 
-```
-
-- Here is all static tracker method, call as Tracker.<mehtod_name>
+### Methods
+Here is all static tracker method, call as Tracker.<mehtod_name>
 
 ```kotlin
 
