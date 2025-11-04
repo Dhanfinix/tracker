@@ -7,7 +7,6 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import id.co.edtslib.tracker.data.TrackerApiService
-import id.co.edtslib.tracker.data.TrackerConfig
 import id.co.edtslib.tracker.data.TrackerRemoteDataSource
 import id.co.edtslib.tracker.di.ConfigurationLocalSource
 import id.co.edtslib.tracker.di.ITrackerRepository
@@ -22,16 +21,14 @@ object RepositoryModule {
     @Singleton
     fun provideTrackerRemoteSource(
         apiService: TrackerApiService,
-        config: TrackerConfig
-    ) = TrackerRemoteDataSource(apiService, config)
+    ) = TrackerRemoteDataSource(apiService)
 
     @Provides
     @Singleton
     fun provideTrackerLocalSource(
         @TrackerSharePref sharedPreferences: SharedPreferences,
         app: Application,
-        config: TrackerConfig
-    ) = TrackerLocalDataSource(sharedPreferences, app, config)
+    ) = TrackerLocalDataSource(sharedPreferences, app)
 
     @Provides
     @Singleton

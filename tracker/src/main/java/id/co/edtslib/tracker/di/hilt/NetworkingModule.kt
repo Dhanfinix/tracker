@@ -5,7 +5,7 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
-import id.co.edtslib.tracker.data.TrackerConfig
+import id.co.edtslib.tracker.Tracker
 import id.co.edtslib.tracker.di.AuthInterceptor
 import id.co.edtslib.tracker.di.UnsafeOkHttpClient
 import okhttp3.OkHttpClient
@@ -19,9 +19,7 @@ object NetworkingModule {
     @Provides
     @Singleton
     @TrackerOkHttp
-    fun provideTrackerOkHttp(
-        config: TrackerConfig
-    )= UnsafeOkHttpClient(config).get()
+    fun provideTrackerOkHttp()= UnsafeOkHttpClient().get()
 
     @Provides
     @Singleton
@@ -37,10 +35,9 @@ object NetworkingModule {
     fun provideRetrofit(
         @TrackerOkHttp okHttpClient: OkHttpClient,
         converterFactory: GsonConverterFactory,
-        config: TrackerConfig
     ): Retrofit = Retrofit.Builder()
-        .baseUrl(config.baseUrl)
-        .client(okHttpClient.newBuilder().addInterceptor(AuthInterceptor(config.token, config.isLegacy)).build())
+        .baseUrl(Tracker.baseUrl)
+        .client(okHttpClient.newBuilder().addInterceptor(AuthInterceptor(Tracker.token, Tracker.isLegacy)).build())
         .addConverterFactory(converterFactory)
         .build()
 

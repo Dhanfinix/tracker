@@ -14,7 +14,7 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import id.co.edtslib.tracker.BuildConfig
-import id.co.edtslib.tracker.data.TrackerConfig
+import id.co.edtslib.tracker.Tracker
 import java.lang.Exception
 import javax.inject.Singleton
 
@@ -26,10 +26,9 @@ object SharedPrefModule {
     @TrackerSharePref
     fun provideTrackerSharedPref(
         app: Application,
-        config: TrackerConfig
     ): SharedPreferences =
         try {
-            if (config.debugging) {
+            if (Tracker.debugging) {
                 PreferenceManager.getDefaultSharedPreferences(app)
             }
             else

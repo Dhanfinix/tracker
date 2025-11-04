@@ -17,48 +17,37 @@ import java.util.Date
 import javax.inject.Inject
 
 /**
- * Tracker is a Hilt-managed analytics coordinator that delegates tracking operations to [TrackerController].
+ * Tracker is a lifecycle-safe, Hilt-managed analytics coordinator responsible for configuring
+ * and delegating tracking operations to the injected [TrackerController].
  *
- * This class is designed for use in a modular tracking library. It receives runtime configuration via
- * dependency injection using [TrackerConfig], which must be provided by the host application.
+ * This class replaces the previous static or ViewModel-based implementation, ensuring proper
+ * dependency injection, modularity, and testability. It is designed to be initialized once
+ * during application startup via [init], and then injected wherever needed.
  *
- * ## Initialization via Hilt
- * To use Tracker in your app, you must provide a [TrackerConfig] instance through a Hilt module.
- * This ensures that all runtime values (e.g., base URL, token, app version) are available at graph construction time.
+ * ## Configuration
+ * The [init] method sets up runtime parameters such as API endpoint, token, and behavior flags.
+ * All configuration fields are exposed as read-only properties to prevent accidental mutation.
  *
- * ### Example: Host App Setup
- * ```kotlin
- * @Module
- * @InstallIn(SingletonComponent::class)
- * object TrackerInitModule {
- *     @Provides
- *     @Singleton
- *     fun provideTrackerConfig(): TrackerConfig {
- *         return TrackerConfig(
- *             baseUrl = "https://your-api.com/tracker/",
- *             token = "your-api-token",
- *             debugging = true,
- *             appVersion = "1.2.3"
- *         )
- *     }
- * }
- * ```
+ * ## Usage
+ * - Call [init] once during app startup (e.g., in `Application.onCreate()`).
+ * - Inject [Tracker] into any Hilt-aware component (Activity, Fragment, Service, etc.).
+ * - Use instance methods to perform tracking operations via the controller.
  *
- * Once configured, you can inject [Tracker] into any Hilt-aware component:
- * ```kotlin
- * @Inject lateinit var tracker: Tracker
- * ```
+ * ## Properties
+ * - [baseUrl], [token], [path], [isLegacy], [resend], [appVersion]: runtime configuration
+ * - [debugging]: enables logging for development and diagnostics
+ * - [currentPageName], [currentPageId]: updated internally during page tracking
+ * - [isInitialized]: guards against premature usage
  *
- * ## Notes
- * - The [TrackerConfig] values are used to populate static metadata such as [appVersion].
- * - The host app is responsible for providing accurate and secure configuration.
- * - Avoid using manual `init()` methods — all setup should be done via DI.
+ * ## Internal State
+ * - [firstImpression], [lastImpression]: used for impression tracking boundaries
  *
- * @param controller The injected [TrackerController] responsible for executing tracking logic.
+ * @param controller The injected [TrackerController] that handles actual tracking logic.
  */
-class Tracker @Inject constructor(
-    private val controller: TrackerController
-) {
+class Tracker @Inject constructor() {
+    @Inject
+    lateinit var controller: TrackerController
+
     data class ImpressionData(
         val data: List<Any>,
         val time: Long
@@ -68,12 +57,66 @@ class Tracker @Inject constructor(
     private var lastImpression = -1
 
     companion object {
+        var isInitialized: Boolean = false
+            private set
+
+        var baseUrl = ""
+            private set
+
+        var token = ""
+            private set
+
+        var path = "apps-tracker-gateway"
+            private set
+
+        var isLegacy = false
+            private set
+
+        var debugging = false
+            private set
+
+        var resend = true
+            private set
+
+        var appVersion = "1.0.0"
+            private set
+
         /** don't set manual, set with resume fun */
         var currentPageName = ""
             private set
         /** don't set manual, set with resume fun */
         var currentPageId = ""
             private set
+
+        /**
+         * Initializes the tracker with runtime configuration.
+         * Must be called once before using any tracking methods.
+         *
+         * @param baseUrl The base URL for the tracking API.
+         * @param token The authentication token for API access.
+         * @param path Optional path segment for the tracking endpoint.
+         * @param isLegacy Whether to enable legacy tracking behavior.
+         * @param resend Whether to allow resending failed events.
+         * @param appVersion The current app version for tracking context.
+         */
+        fun init(
+            baseUrl: String,
+            token: String,
+            path: String = "apps-tracker-gateway",
+            isLegacy: Boolean = false,
+            resend: Boolean = true,
+            debugging: Boolean = false,
+            appVersion: String = "1.0.0"
+        ) {
+            this.baseUrl = baseUrl
+            this.token = token
+            this.path = path
+            this.isLegacy = isLegacy
+            this.resend = resend
+            this.debugging = debugging
+            this.appVersion = appVersion
+            isInitialized = true
+        }
     }
 
     fun getInstallReferer() = controller.getInstallReferer()

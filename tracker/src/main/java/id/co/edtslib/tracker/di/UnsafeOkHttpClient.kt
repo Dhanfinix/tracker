@@ -2,7 +2,7 @@ package id.co.edtslib.tracker.di
 
 import android.annotation.SuppressLint
 import com.facebook.stetho.okhttp3.StethoInterceptor
-import id.co.edtslib.tracker.data.TrackerConfig
+import id.co.edtslib.tracker.Tracker
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import java.security.SecureRandom
@@ -13,12 +13,10 @@ import javax.net.ssl.SSLSession
 import javax.net.ssl.TrustManager
 import javax.net.ssl.X509TrustManager
 
-class UnsafeOkHttpClient(
-    private val config: TrackerConfig
-) {
+class UnsafeOkHttpClient() {
     @SuppressLint("CustomX509TrustManager")
     fun get(): OkHttpClient {
-        val interceptor = HttpLoggingInterceptor().apply { level = if (config.debugging)
+        val interceptor = HttpLoggingInterceptor().apply { level = if (Tracker.debugging)
             HttpLoggingInterceptor.Level.BODY else HttpLoggingInterceptor.Level.NONE }
         return try {
             // Create a trust manager that does not validate certificate chains
