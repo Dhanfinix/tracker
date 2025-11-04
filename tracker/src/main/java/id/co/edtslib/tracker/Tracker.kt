@@ -62,24 +62,16 @@ class Tracker @Inject constructor() {
 
         var baseUrl = ""
             private set
-
         var token = ""
             private set
-
         var path = "apps-tracker-gateway"
             private set
-
         var isLegacy = false
             private set
 
         var debugging = false
-            private set
-
         var resend = true
-            private set
-
         var appVersion = "1.0.0"
-            private set
 
         /** don't set manual, set with resume fun */
         var currentPageName = ""
@@ -96,25 +88,17 @@ class Tracker @Inject constructor() {
          * @param token The authentication token for API access.
          * @param path Optional path segment for the tracking endpoint.
          * @param isLegacy Whether to enable legacy tracking behavior.
-         * @param resend Whether to allow resending failed events.
-         * @param appVersion The current app version for tracking context.
          */
         fun init(
             baseUrl: String,
             token: String,
             path: String = "apps-tracker-gateway",
             isLegacy: Boolean = false,
-            resend: Boolean = true,
-            debugging: Boolean = false,
-            appVersion: String = "1.0.0"
         ) {
             this.baseUrl = baseUrl
             this.token = token
             this.path = path
             this.isLegacy = isLegacy
-            this.resend = resend
-            this.debugging = debugging
-            this.appVersion = appVersion
             isInitialized = true
         }
     }
