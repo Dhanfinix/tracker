@@ -2,6 +2,8 @@ plugins {
     id 'com.android.library'
     id 'org.jetbrains.kotlin.android'
     id 'maven-publish'
+    id 'com.google.devtools.ksp'
+    id 'com.google.dagger.hilt.android'
 }
 
 // Load GitHub properties file
@@ -89,6 +91,10 @@ dependencies {
     //koin
     implementation "io.insert-koin:koin-core:4.1.1"
     implementation "io.insert-koin:koin-android:4.1.1"
+
+    //hilt
+    implementation "com.google.dagger:hilt-android:2.57.1"
+    ksp "com.google.dagger:hilt-compiler:2.57.1"
 
     //lifecycle
     implementation "androidx.lifecycle:lifecycle-livedata-ktx:2.5.1"
