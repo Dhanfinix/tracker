@@ -1,5 +1,9 @@
 # Changelog
 
+## [2.3.20-3] - 2025-11-04
+### Enhance
++ FEAT: Takeout TrackerConfig.kt, because actually controller can be directly injected inside class
+
 ## [2.3.20-2] - 2025-11-04
 ### Enhance
 + REFACTOR: Migrate DI from Koin to Hilt and improve configuration handling
