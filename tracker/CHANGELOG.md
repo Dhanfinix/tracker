@@ -1,5 +1,9 @@
 # Changelog
 
+## [2.3.20-0.0.8] - 2025-11-05
+### FEAT
++ Add Hilt util for manual dependency access
+
 ## [2.3.20-0.0.7] - 2025-11-05
 ### FEAT
 + Add Hilt entry point for tracker
