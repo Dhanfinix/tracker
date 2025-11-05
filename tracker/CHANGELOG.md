@@ -1,5 +1,10 @@
 # Changelog
 
+## [2.3.20-0.0.6] - 2025-11-05
+### Enhance
++ Add tracker initialization check
++ Add placeholder tracker url to prevent error when creating the retrofit
+
 ## [2.3.20-0.0.5] - 2025-11-05
 ### Enhance
 + New versioning convention
