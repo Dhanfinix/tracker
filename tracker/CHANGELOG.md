@@ -1,5 +1,10 @@
 # Changelog
 
+## [2.3.20-0.0.5] - 2025-11-05
+### Enhance
++ New versioning convention
++ FEAT: Add Hilt qualifiers for Gson and ConverterFactory
+
 ## [2.3.20-4] - 2025-11-04
 ### Enhance
 + FEAT: Remove unnecessary variables from init function and expose that variable to set from outside Tracker
