@@ -1,6 +1,8 @@
 package id.co.edtslib.tracker
 
 import android.content.Intent
+import android.util.Patterns
+import androidx.core.net.toUri
 import androidx.fragment.app.FragmentActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -57,10 +59,12 @@ class Tracker @Inject constructor() {
     private var lastImpression = -1
 
     companion object {
+        const val PLACEHOLDER_TRACKER_URL = "https://placeholder-tracker-url.com"
+
         var isInitialized: Boolean = false
             private set
 
-        var baseUrl = ""
+        var baseUrl = PLACEHOLDER_TRACKER_URL
             private set
         var token = ""
             private set
@@ -103,7 +107,46 @@ class Tracker @Inject constructor() {
         }
     }
 
-    fun getInstallReferer() = controller.getInstallReferer()
+    /**
+     * Verifies that the tracker has been initialized and that the configuration is valid before
+     * executing a given action. This method acts as a guard to prevent tracking calls from being
+     * made prematurely or with invalid settings.
+     *
+     * If initialization is incomplete or the configuration is invalid (e.g., placeholder or
+     * malformed `baseUrl`), a warning is logged to Logcat when [debugging] is enabled. The
+     * provided `onInitialized` lambda is only executed if the tracker is fully initialized and
+     * configured correctly.
+     *
+     * @param functionName The name of the calling function, used for logging purposes.
+     * @param onInitialized A high-order function to be executed only if the tracker is properly
+     *                      initialized and configured.
+     */
+    fun checkInitialization(
+        functionName: String,
+        onInitialized: () -> Unit
+    ) {
+        val isValidUrl = Patterns.WEB_URL.matcher(baseUrl).matches()
+        if (!isInitialized && debugging) {
+            android.util.Log.w("Tracker", "$functionName called before init()")
+        } else if (
+            baseUrl == PLACEHOLDER_TRACKER_URL || 
+            !isValidUrl || 
+            baseUrl.isEmpty()
+        ) {
+            android.util.Log.w(
+                "Tracker",
+                "$functionName called with invalid baseUrl, please check your init()"
+            )
+        } else if (isInitialized) {
+            onInitialized()
+        }
+    }
+
+    fun getInstallReferer(){
+        checkInitialization("getInstallReferer"){
+            controller.getInstallReferer()
+        }
+    }
 
     fun checkInstallReferrer(activity: FragmentActivity) {
         val referrerClient = InstallReferrerClient.newBuilder(activity).build()
@@ -140,34 +183,50 @@ class Tracker @Inject constructor() {
     }
 
     fun checkInstallReferrer(utm_raw: String?, intent: Intent?) {
-        if (intent?.data?.getQueryParameter("utm_source") != null) {
-            controller.setInstallReferer(InstallReferer(intent.data?.toString()))
-        } else {
-            controller.setInstallReferer(InstallReferer(utm_raw))
+        checkInitialization("checkInstallReferrer"){
+            if (intent?.data?.getQueryParameter("utm_source") != null) {
+                controller.setInstallReferer(InstallReferer(intent.data?.toString()))
+            } else {
+                controller.setInstallReferer(InstallReferer(utm_raw))
+            }
         }
     }
 
     fun setUserId(userId: Long) {
-        controller.setUserId(userId)
+        checkInitialization("setUserId"){
+            controller.setUserId(userId)
+        }
     }
 
     fun setLatLng(lat: Double, lng: Double) {
-        controller.setLatLng(lat, lng)
+        checkInitialization("setLatLng"){
+            controller.setLatLng(lat, lng)
+        }
     }
 
-    fun getService() = controller.getService()
+    fun getService() {
+        checkInitialization("getService"){
+            controller.getService()
+        }
+    }
 
     fun setService(service: String) {
-        controller.setService(service)
+        checkInitialization("setService"){
+            controller.setService(service)
+        }
     }
 
     fun trackPage(pageName: String, pageId: String, pageUrlPath: String = "") {
-        controller.trackPage(pageName, pageId, pageUrlPath)
-        resumePage(pageName, pageId)
+        checkInitialization("trackPage"){
+            controller.trackPage(pageName, pageId, pageUrlPath)
+            resumePage(pageName, pageId)
+        }
     }
 
     fun trackPageDetail(detail: Any?) {
-        controller.trackPageDetail(detail)
+        checkInitialization("trackPageDetail"){
+            controller.trackPageDetail(detail)
+        }
     }
 
     fun trackClick(
@@ -176,19 +235,27 @@ class Tracker @Inject constructor() {
         url: String? = null,
         details: Any? = null
     ) {
-        controller.trackClick(name, category, url, details)
+        checkInitialization("trackClick"){
+            controller.trackClick(name, category, url, details)
+        }
     }
 
     fun trackFilters(filters: List<TrackerFilterDetail>, category: String = "") {
-        controller.trackFilters(filters, category)
+        checkInitialization("trackFilters"){
+            controller.trackFilters(filters, category)
+        }
     }
 
     fun trackSort(sortType: String) {
-        controller.trackSort(sortType)
+        checkInitialization("trackSort"){
+            controller.trackSort(sortType)
+        }
     }
 
     fun trackSubmissionSuccess(name: String, category: String, details: Any? = null) {
-        controller.trackSubmission(name, category, true, "", details)
+        checkInitialization("trackSubmissionSuccess"){
+            controller.trackSubmission(name, category, true, "", details)
+        }
     }
 
     fun trackSubmissionFailed(
@@ -197,7 +264,9 @@ class Tracker @Inject constructor() {
         reason: String?,
         details: Any? = null
     ) {
-        controller.trackSubmission(name, category, false, reason, details)
+        checkInitialization("trackSubmissionFailed"){
+            controller.trackSubmission(name, category, false, reason, details)
+        }
     }
 
     fun <S, T> trackImpression(
@@ -205,7 +274,9 @@ class Tracker @Inject constructor() {
         data: List<*>,
         mapper: ((data: S) -> T)? = null
     ) {
-        controller.trackImpression<S, T>(category, Date().time, data, mapper)
+        checkInitialization("trackImpression"){
+            controller.trackImpression<S, T>(category, Date().time, data, mapper)
+        }
     }
 
     fun <S, T> trackImpression(
@@ -214,33 +285,47 @@ class Tracker @Inject constructor() {
         data: List<*>,
         mapper: ((data: S) -> T)? = null
     ) {
-        controller.trackImpression<S, T>(category, time, data, mapper)
+        checkInitialization("trackImpression"){
+            controller.trackImpression<S, T>(category, time, data, mapper)
+        }
     }
 
     fun trackDisplayedItems(data: MutableList<Any>) {
-        controller.trackDisplayedItems(data)
+        checkInitialization("trackDisplayedItems"){
+            controller.trackDisplayedItems(data)
+        }
     }
 
     fun trackSearch(keyword: String, details: Any? = null) {
-        controller.trackSearch(keyword, details)
+        checkInitialization("trackSearch"){
+            controller.trackSearch(keyword, details)
+        }
     }
 
     fun trackOpenApplication() {
-        controller.createSession()?.observeForever {
-            controller.trackOpenApplication()
+        checkInitialization("trackOpenApplication"){
+            controller.createSession().observeForever {
+                controller.trackOpenApplication()
+            }
         }
     }
 
     fun trackCloseApplication() {
-        controller.trackCloseApplication()
+        checkInitialization("trackCloseApplication"){
+            controller.trackCloseApplication()
+        }
     }
 
     fun trackResumeApplication() {
-        controller.trackResumeApplication()
+        checkInitialization("trackResumeApplication"){
+            controller.trackResumeApplication()
+        }
     }
 
     fun trackMinimizeApplication() {
-        controller.trackMinimizeApplication()
+        checkInitialization("trackMinimizeApplication"){
+            controller.trackMinimizeApplication()
+        }
     }
 
     fun resumePage(pageName: String, pageId: String) {
@@ -248,7 +333,13 @@ class Tracker @Inject constructor() {
         currentPageId = pageId
     }
 
-    fun getData(): TrackerData? = controller.getData()
+    fun getData(): TrackerData? {
+        var data : TrackerData? = null
+        checkInitialization("trackMinimizeApplication"){
+            data = controller.getData()
+        }
+        return data
+    }
 
     fun <S, T> setImpressionRecyclerView(
         category: String,
