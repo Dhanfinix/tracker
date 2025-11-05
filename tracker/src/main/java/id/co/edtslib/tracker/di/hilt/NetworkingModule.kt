@@ -23,18 +23,22 @@ object NetworkingModule {
 
     @Provides
     @Singleton
+    @TrackerGson
     fun provideGson() = Gson()
 
     @Provides
     @Singleton
-    fun provideConverterFactory(gson: Gson): GsonConverterFactory = GsonConverterFactory.create(gson)
+    @TrackerConverterFactory
+    fun provideConverterFactory(
+        @TrackerGson gson: Gson
+    ): GsonConverterFactory = GsonConverterFactory.create(gson)
 
     @Provides
     @Singleton
     @TrackerRetrofit
     fun provideRetrofit(
         @TrackerOkHttp okHttpClient: OkHttpClient,
-        converterFactory: GsonConverterFactory,
+        @TrackerConverterFactory converterFactory: GsonConverterFactory,
     ): Retrofit = Retrofit.Builder()
         .baseUrl(Tracker.baseUrl)
         .client(okHttpClient.newBuilder().addInterceptor(AuthInterceptor(Tracker.token, Tracker.isLegacy)).build())

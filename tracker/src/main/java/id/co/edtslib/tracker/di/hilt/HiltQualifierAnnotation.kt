@@ -13,3 +13,11 @@ internal annotation class TrackerRetrofit
 @Qualifier
 @Retention(AnnotationRetention.BINARY)
 internal annotation class TrackerSharePref
+
+@Qualifier
+@Retention(AnnotationRetention.BINARY)
+internal annotation class TrackerGson
+
+@Qualifier
+@Retention(AnnotationRetention.BINARY)
+internal annotation class TrackerConverterFactory
