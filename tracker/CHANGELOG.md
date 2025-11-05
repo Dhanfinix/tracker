@@ -1,5 +1,9 @@
 # Changelog
 
+## [2.3.20-0.0.7] - 2025-11-05
+### FEAT
++ Add Hilt entry point for tracker
+
 ## [2.3.20-0.0.6] - 2025-11-05
 ### Enhance
 + Add tracker initialization check
