@@ -15,33 +15,38 @@ githubProperties.load(new FileInputStream(rootProject.file("github.properties"))
  * Second part is this library's version
  */
 def getVersionName = { ->
-    return "2.3.20-0.0.9" // Replace with version name
+    return "2.3.20-0.0.10"
 }
 
 // Function to retrieve artifact ID
 def getMyArtifactId = { ->
-    return "tracker" // Replace with library name ID
+    return "tracker"
 }
 
 afterEvaluate {
     publishing {
         publications {
             bar(MavenPublication) {
-                groupId = "id.co.edtslib" // Replace with group ID
+                from components.release
+
+                groupId = "id.co.edtslib"
                 artifactId = getMyArtifactId()
                 version = getVersionName()
-                artifact("$buildDir/outputs/aar/${getMyArtifactId()}-release.aar")
+
+                pom {
+                    name = getMyArtifactId()
+                    description = 'Tracker Library - See CHANGELOG.md for version history'
+                    url = 'https://github.com/Dhanfinix/tracker'
+                }
             }
         }
 
         repositories {
             maven {
                 name = "GitHubPackages"
-                // Configure the URL of your package repository on GitHub
-                url = uri("https://maven.pkg.github.com/Dhanfinix/tracker") // Replace with GitHub details
+                url = uri("https://maven.pkg.github.com/Dhanfinix/tracker")
 
                 credentials {
-                    // Use GitHub properties or environment variables for credentials
                     username = githubProperties['USER_ID'] ?: System.getenv("USER_ID")
                     password = githubProperties['ACCESS_TOKEN'] ?: System.getenv("ACCESS_TOKEN")
                 }
