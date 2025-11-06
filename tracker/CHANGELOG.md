@@ -1,5 +1,9 @@
 # Changelog
 
+## [2.3.20-0.0.12] - 2025-11-06
+### FEAT
++ Add tracker composable for Button and LazyColumn
+
 ## [2.3.20-0.0.11] - 2025-11-06
 ### FEAT
 + Include sourcesJar and JavadocJar
