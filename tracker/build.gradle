@@ -88,8 +88,8 @@ android {
 
     publishing {
         singleVariant("release") {
-            withSourcesJar()      // Optional: include sources
-            withJavadocJar()      // Optional: include javadoc
+            withSourcesJar()      // Users can "Go to Definition" in their IDE
+            withJavadocJar()      // Better documentation support
         }
     }
 }
