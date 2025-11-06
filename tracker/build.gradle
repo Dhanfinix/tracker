@@ -85,6 +85,13 @@ android {
     buildFeatures {
         buildConfig = true
     }
+
+    publishing {
+        singleVariant("release") {
+            withSourcesJar()      // Optional: include sources
+            withJavadocJar()      // Optional: include javadoc
+        }
+    }
 }
 
 dependencies {
