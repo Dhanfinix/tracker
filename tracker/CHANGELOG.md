@@ -1,5 +1,9 @@
 # Changelog
 
+## [2.3.20-0.0.11] - 2025-11-06
+### FEAT
++ Include sourcesJar and JavadocJar
+
 ## [2.3.20-0.0.10] - 2025-11-06
 ### CHANGE
 + Configure Maven publication from release components containing dependencies metadata

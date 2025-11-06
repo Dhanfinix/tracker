@@ -15,7 +15,7 @@ githubProperties.load(new FileInputStream(rootProject.file("github.properties"))
  * Second part is this library's version
  */
 def getVersionName = { ->
-    return "2.3.20-0.0.10"
+    return "2.3.20-0.0.11"
 }
 
 // Function to retrieve artifact ID
