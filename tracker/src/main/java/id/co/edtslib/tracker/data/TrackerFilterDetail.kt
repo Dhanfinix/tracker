@@ -1,13 +1,15 @@
 package id.co.edtslib.tracker.data
 
-import com.google.gson.annotations.SerializedName
-import java.util.*
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.JsonElement
 
+@Serializable
 data class TrackerFilterDetail (
-    @field:SerializedName("filter_type")
+    @SerialName("filter_type")
     val filterType: String,
-    @field:SerializedName("element")
+    @SerialName("element")
     val element: String,
-    @field:SerializedName("filter")
-    val filter: List<Any>
+    @SerialName("filter")
+    val filter: List<JsonElement>
 )

@@ -1,6 +1,5 @@
 package id.co.edtslib.tracker.di.hilt
 
-import com.google.gson.Gson
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -8,9 +7,11 @@ import dagger.hilt.components.SingletonComponent
 import id.co.edtslib.tracker.Tracker
 import id.co.edtslib.tracker.di.AuthInterceptor
 import id.co.edtslib.tracker.di.UnsafeOkHttpClient
+import kotlinx.serialization.json.Json
+import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
+import retrofit2.converter.kotlinx.serialization.asConverterFactory
 import javax.inject.Singleton
 
 @Module
@@ -23,26 +24,25 @@ object NetworkingModule {
 
     @Provides
     @Singleton
-    @TrackerGson
-    fun provideGson() = Gson()
-
-    @Provides
-    @Singleton
-    @TrackerConverterFactory
-    fun provideConverterFactory(
-        @TrackerGson gson: Gson
-    ): GsonConverterFactory = GsonConverterFactory.create(gson)
-
-    @Provides
-    @Singleton
     @TrackerRetrofit
     fun provideRetrofit(
         @TrackerOkHttp okHttpClient: OkHttpClient,
-        @TrackerConverterFactory converterFactory: GsonConverterFactory,
-    ): Retrofit = Retrofit.Builder()
-        .baseUrl(Tracker.baseUrl)
-        .client(okHttpClient.newBuilder().addInterceptor(AuthInterceptor(Tracker.token, Tracker.isLegacy)).build())
-        .addConverterFactory(converterFactory)
-        .build()
+    ): Retrofit {
+        val json = Json { ignoreUnknownKeys = true }
+        return Retrofit.Builder()
+            .baseUrl(Tracker.baseUrl)
+            .client(okHttpClient
+                .newBuilder()
+                .addInterceptor(
+                    AuthInterceptor(Tracker.token, Tracker.isLegacy)
+                ).build()
+            )
+            .addConverterFactory(
+                json.asConverterFactory(
+                    "application/json; charset=UTF8".toMediaType()
+                )
+            )
+            .build()
+    }
 
 }

@@ -1,5 +1,8 @@
 package id.co.edtslib.tracker.data
 
+import kotlinx.serialization.Serializable
+
+@Serializable
 data class Configuration (
     var sessionId: String,
     var userId: Long,

@@ -1,12 +1,14 @@
 package id.co.edtslib.tracker.data
 
 import android.annotation.SuppressLint
-import com.google.gson.annotations.SerializedName
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
+@Serializable
 data class TrackerUser (
-    @SerializedName("session_id")
+    @SerialName("session_id")
     val sessionId: String?,
-    @SerializedName("user_id")
+    @SerialName("user_id")
     val userId: Long?
 ){
     companion object {

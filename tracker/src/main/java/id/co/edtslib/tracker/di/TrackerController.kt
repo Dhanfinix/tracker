@@ -7,6 +7,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
+import kotlinx.serialization.json.JsonElement
 import javax.inject.Inject
 
 /**
@@ -90,7 +91,7 @@ open class TrackerController @Inject constructor(
         }
     }
 
-    fun trackPageDetail(detail: Any?) {
+    fun trackPageDetail(detail: JsonElement?) {
         CoroutineScope(Dispatchers.IO).launch {
             trackerUseCase.trackPageDetail(detail).collect()
         }
@@ -100,7 +101,7 @@ open class TrackerController @Inject constructor(
         name: String,
         category: String? = null,
         url: String? = null,
-        details: Any? = null
+        details: JsonElement? = null
     ) {
         CoroutineScope(Dispatchers.IO).launch {
             try {
@@ -129,31 +130,31 @@ open class TrackerController @Inject constructor(
         category: String,
         status: Boolean,
         reason: String?,
-        details: Any? = null
+        details: JsonElement? = null
     ) {
         CoroutineScope(Dispatchers.IO).launch {
             trackerUseCase.trackSubmission(name, category, status, reason, details).collect()
         }
     }
 
-    fun <S, T> trackImpression(
+    fun trackImpression(
         category: String,
         time: Long,
-        data: List<*>,
-        mapper: ((data: S) -> T)? = null
+        data: List<JsonElement>,
+        mapper: ((data: JsonElement) -> JsonElement?)? = null
     ) {
         CoroutineScope(Dispatchers.IO).launch {
-            trackerUseCase.trackImpression<S, T>(category, time, data, mapper).collect()
+            trackerUseCase.trackImpression(category, time, data, mapper).collect()
         }
     }
 
-    fun trackDisplayedItems(data: MutableList<Any>) {
+    fun trackDisplayedItems(data: MutableList<JsonElement>) {
         CoroutineScope(Dispatchers.IO).launch {
             trackerUseCase.trackDisplayedItems(data).collect()
         }
     }
 
-    fun trackSearch(keyword: String, details: Any? = null) {
+    fun trackSearch(keyword: String, details: JsonElement? = null) {
         CoroutineScope(Dispatchers.IO).launch {
             trackerUseCase.trackSearch(keyword, details).collect()
         }

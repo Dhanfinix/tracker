@@ -1,8 +1,10 @@
 package id.co.edtslib.tracker.data
 
-import com.google.gson.annotations.SerializedName
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
+@Serializable
 data class InstallReferer(
-    @SerializedName("utm_raw")
+    @SerialName("utm_raw")
     val utm_raw: String?
 )

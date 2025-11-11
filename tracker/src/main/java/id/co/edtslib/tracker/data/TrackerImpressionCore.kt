@@ -1,29 +1,31 @@
 package id.co.edtslib.tracker.data
 
-import com.google.gson.annotations.SerializedName
 import id.co.edtslib.tracker.Tracker
-import java.util.*
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.JsonElement
 
+@Serializable
 data class TrackerImpressionCore(
-    @SerializedName("event_name")
+    @SerialName("event_name")
     val eventName: String,
-    @SerializedName("event_timestamp")
+    @SerialName("event_timestamp")
     val eventTimeStamp: String,
-    @SerializedName("pageview_id")
+    @SerialName("pageview_id")
     val pageViewId: String,
-    @SerializedName("event_id")
+    @SerialName("event_id")
     val eventId: Long,
-    @SerializedName("event_category")
+    @SerialName("event_category")
     val eventCategory: String,
-    @SerializedName("page_name")
+    @SerialName("page_name")
     val pageName: String,
-    @SerializedName("impression_list")
-    val impressionList: List<*>,
-    @SerializedName("service")
+    @SerialName("impression_list")
+    val impressionList: List<JsonElement>,
+    @SerialName("service")
     val service: String
 ) {
     companion object {
-        fun create(eventId: Long, category: String, time: Long, data: List<*>, service: String) =
+        fun create(eventId: Long, category: String, time: Long, data: List<JsonElement>, service: String) =
             TrackerImpressionCore(
                 eventName = "user_impression",
                 eventTimeStamp = time.toString(),

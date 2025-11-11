@@ -1,20 +1,22 @@
 package id.co.edtslib.tracker.data
 
-import com.google.gson.annotations.SerializedName
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 import java.util.*
 
+@Serializable
 data class TrackerActivityCore (
-    @SerializedName("event_name")
+    @SerialName("event_name")
     val eventName: String,
-    @SerializedName("event_timestamp")
+    @SerialName("event_timestamp")
     val eventTimeStamp: String,
-    @SerializedName("pageview_id")
+    @SerialName("pageview_id")
     val pageViewId: String,
-    @SerializedName("event_id")
+    @SerialName("event_id")
     val eventId: Long,
-    @SerializedName("activity_details")
+    @SerialName("activity_details")
     val activityDetails: String,
-    @SerializedName("service")
+    @SerialName("service")
     val service: String
 ) {
     companion object {

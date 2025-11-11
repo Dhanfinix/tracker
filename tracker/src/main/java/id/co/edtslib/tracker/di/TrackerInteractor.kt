@@ -2,6 +2,7 @@ package id.co.edtslib.tracker.di
 
 import id.co.edtslib.tracker.data.InstallReferer
 import id.co.edtslib.tracker.data.TrackerFilterDetail
+import kotlinx.serialization.json.JsonElement
 
 class TrackerInteractor(private val repository: ITrackerRepository) : TrackerUseCase {
     override fun createSession() = repository.createSession()
@@ -21,9 +22,9 @@ class TrackerInteractor(private val repository: ITrackerRepository) : TrackerUse
     override fun trackPage(pageName: String, pageId: String, pageUrlPath: String) =
         repository.trackPage(pageName, pageId, pageUrlPath)
 
-    override fun trackPageDetail(detail: Any?) = repository.trackPageDetail(detail)
+    override fun trackPageDetail(detail: JsonElement?) = repository.trackPageDetail(detail)
 
-    override fun trackClick(name: String, category: String?, url: String?, details: Any?) =
+    override fun trackClick(name: String, category: String?, url: String?, details: JsonElement?) =
         repository.trackClick(name, category, url, details)
 
     override fun trackFilters(filters: List<TrackerFilterDetail>, category: String) =
@@ -31,24 +32,24 @@ class TrackerInteractor(private val repository: ITrackerRepository) : TrackerUse
 
     override fun trackSort(sortType: String) = repository.trackSort(sortType)
 
-    override fun <S, T> trackImpression(
+    override fun trackImpression(
         category: String,
         time: Long,
-        data: List<*>,
-        mapper: ((data: S) -> T)?
-    ) = repository.trackImpression<S, T>(category, time, data, mapper)
+        data: List<JsonElement>,
+        mapper: ((data: JsonElement) -> JsonElement?)?
+    ) = repository.trackImpression(category, time, data, mapper)
 
     override fun trackSubmission(
         name: String,
         category: String,
         status: Boolean,
         reason: String?,
-        details: Any?
+        details: JsonElement?
     ) =
         repository.trackSubmission(name, category, status, reason, details)
 
-    override fun trackDisplayedItems(data: MutableList<Any>) = repository.trackDisplayedItems(data)
-    override fun trackSearch(keyword: String, details: Any?) =
+    override fun trackDisplayedItems(data: MutableList<JsonElement>) = repository.trackDisplayedItems(data)
+    override fun trackSearch(keyword: String, details: JsonElement?) =
         repository.trackSearch(keyword, details)
 
     override fun getData() = repository.getData()
