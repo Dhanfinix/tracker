@@ -2,6 +2,7 @@ package id.co.edtslib.tracker
 
 import android.content.Intent
 import android.util.Patterns
+import androidx.core.net.toUri
 import androidx.fragment.app.FragmentActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -14,8 +15,6 @@ import id.co.edtslib.tracker.data.InstallReferer
 import id.co.edtslib.tracker.data.TrackerData
 import id.co.edtslib.tracker.data.TrackerFilterDetail
 import id.co.edtslib.tracker.di.TrackerController
-import id.co.edtslib.tracker.util.toSafeJsonElement
-import kotlinx.serialization.json.JsonElement
 import java.util.Date
 import javax.inject.Inject
 
@@ -52,7 +51,7 @@ class Tracker @Inject constructor() {
     lateinit var controller: TrackerController
 
     data class ImpressionData(
-        val data: List<JsonElement>,
+        val data: List<Any>,
         val time: Long
     )
 
@@ -224,20 +223,20 @@ class Tracker @Inject constructor() {
         }
     }
 
-    inline fun <reified T> trackPageDetail(detail: T?) {
+    fun trackPageDetail(detail: Any?) {
         checkInitialization("trackPageDetail"){
-            controller.trackPageDetail(detail.toSafeJsonElement())
+            controller.trackPageDetail(detail)
         }
     }
 
-    inline fun <reified T> trackClick(
+    fun trackClick(
         name: String,
         category: String? = null,
         url: String? = null,
-        details: T? = null
+        details: Any? = null
     ) {
         checkInitialization("trackClick"){
-            controller.trackClick(name, category, url, details.toSafeJsonElement())
+            controller.trackClick(name, category, url, details)
         }
     }
 
@@ -253,61 +252,53 @@ class Tracker @Inject constructor() {
         }
     }
 
-    inline fun <reified T> trackSubmissionSuccess(
-        name: String,
-        category: String,
-        details: T? = null
-    ) {
+    fun trackSubmissionSuccess(name: String, category: String, details: Any? = null) {
         checkInitialization("trackSubmissionSuccess"){
-            controller.trackSubmission(name, category, true, "", details.toSafeJsonElement())
+            controller.trackSubmission(name, category, true, "", details)
         }
     }
 
-    inline fun <reified T> trackSubmissionFailed(
+    fun trackSubmissionFailed(
         name: String,
         category: String,
         reason: String?,
-        details: T? = null
+        details: Any? = null
     ) {
         checkInitialization("trackSubmissionFailed"){
-            controller.trackSubmission(name, category, false, reason, details.toSafeJsonElement())
+            controller.trackSubmission(name, category, false, reason, details)
         }
     }
 
-    fun trackImpression(
+    fun <S, T> trackImpression(
         category: String,
-        data: List<JsonElement>,
-        mapper: ((data: JsonElement) -> JsonElement?)? = null
+        data: List<*>,
+        mapper: ((data: S) -> T)? = null
     ) {
         checkInitialization("trackImpression"){
-            controller.trackImpression(category, Date().time, data, mapper)
+            controller.trackImpression<S, T>(category, Date().time, data, mapper)
         }
     }
 
-    fun trackImpression(
+    fun <S, T> trackImpression(
         category: String,
         time: Long,
-        data: List<JsonElement>,
-        mapper: ((data: JsonElement) -> JsonElement?)? = null
+        data: List<*>,
+        mapper: ((data: S) -> T)? = null
     ) {
         checkInitialization("trackImpression"){
-            controller.trackImpression(category, time, data, mapper)
+            controller.trackImpression<S, T>(category, time, data, mapper)
         }
     }
 
-    inline fun <reified T> trackDisplayedItems(data: MutableList<T>) {
+    fun trackDisplayedItems(data: MutableList<Any>) {
         checkInitialization("trackDisplayedItems"){
-            val newData = mutableListOf<JsonElement>()
-            data.forEach {
-                it.toSafeJsonElement()?.let { element -> newData.add(element) }
-            }
-            controller.trackDisplayedItems(newData)
+            controller.trackDisplayedItems(data)
         }
     }
 
-    inline fun <reified T> trackSearch(keyword: String, details: T? = null) {
+    fun trackSearch(keyword: String, details: Any? = null) {
         checkInitialization("trackSearch"){
-            controller.trackSearch(keyword, details.toSafeJsonElement())
+            controller.trackSearch(keyword, details)
         }
     }
 
@@ -350,10 +341,10 @@ class Tracker @Inject constructor() {
         return data
     }
 
-    fun setImpressionRecyclerView(
+    fun <S, T> setImpressionRecyclerView(
         category: String,
         recyclerView: RecyclerView,
-        mapper: ((data: JsonElement) -> JsonElement?)? = null
+        mapper: ((data: S) -> T)? = null
     ) {
         firstImpression = -1
         lastImpression = -1
@@ -425,20 +416,19 @@ class Tracker @Inject constructor() {
         })
     }
 
-    private fun <T> addImpression(
+    private fun addImpression(
         recyclerView: RecyclerView,
         first: Int,
         end: Int,
-        adapter: BaseRecyclerViewAdapter<*, T>
+        adapter: BaseRecyclerViewAdapter<*, *>
     ) {
-        val l = mutableListOf<JsonElement>()
+        val l = mutableListOf<Any>()
         for (i in first until end + 1) {
             if (adapter.list.isNotEmpty()) {
                 val realPosition = i % adapter.list.size
                 if (realPosition >= 0 && realPosition < adapter.list.size) {
-                    val item = adapter.list[realPosition]
-                    item?.toSafeJsonElement()?.let {
-                        l.add(it)
+                    if (adapter.list[realPosition] != null) {
+                        l.add(adapter.list[realPosition]!!)
                     }
                 }
             }
@@ -460,14 +450,13 @@ class Tracker @Inject constructor() {
         end: Int,
         adapter: BaseRecyclerView2
     ) {
-        val l = mutableListOf<JsonElement>()
+        val l = mutableListOf<Any>()
         for (i in first until end + 1) {
             if (adapter.list.isNotEmpty()) {
                 val realPosition = i % adapter.list.size
                 if (realPosition >= 0 && realPosition < adapter.list.size) {
-                    val item = adapter.list[realPosition].data
-                    item?.toSafeJsonElement()?.let {
-                        l.add(it)
+                    if (adapter.list[realPosition].data != null) {
+                        l.add(adapter.list[realPosition].data!!)
                     }
                 }
             }

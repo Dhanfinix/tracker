@@ -1,34 +1,31 @@
 package id.co.edtslib.tracker.data
 
+import com.google.gson.annotations.SerializedName
 import id.co.edtslib.tracker.Tracker
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
-import kotlinx.serialization.json.JsonElement
 import java.util.*
 
-@Serializable
 data class TrackerSubmissionCore(
-    @SerialName("event_name")
+    @SerializedName("event_name")
     val eventName: String,
-    @SerialName("event_timestamp")
+    @SerializedName("event_timestamp")
     val eventTimeStamp: String,
-    @SerialName("pageview_id")
+    @SerializedName("pageview_id")
     val pageViewId: String,
-    @SerialName("event_id")
+    @SerializedName("event_id")
     val eventId: Long,
-    @SerialName("event_label")
+    @SerializedName("event_label")
     val eventLabel: String,
-    @SerialName("event_category")
+    @SerializedName("event_category")
     val eventCategory: String,
-    @SerialName("page_name")
+    @SerializedName("page_name")
     val pageName: String,
-    @SerialName("event_status")
+    @SerializedName("event_status")
     val eventStatus: String,
-    @SerialName("failed_reason")
+    @SerializedName("failed_reason")
     val eventFailedReason: String?,
-    @SerialName("details")
-    val details: JsonElement?,
-    @SerialName("service")
+    @SerializedName("details")
+    val details: Any?,
+    @SerializedName("service")
     val service: String
 ) {
     companion object {
@@ -38,7 +35,7 @@ data class TrackerSubmissionCore(
             category: String,
             status: Boolean,
             reason: String?,
-            details: JsonElement? = null,
+            details: Any? = null,
             service: String
         ) = TrackerSubmissionCore(
                 eventName = "event_submission",

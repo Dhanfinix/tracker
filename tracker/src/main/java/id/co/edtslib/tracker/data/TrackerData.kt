@@ -1,19 +1,16 @@
 package id.co.edtslib.tracker.data
 
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
-import kotlinx.serialization.json.JsonElement
+import com.google.gson.annotations.SerializedName
 
-@Serializable
 data class TrackerData(
-    @SerialName("core")
-    val core: JsonElement,
-    @SerialName("user")
+    @SerializedName("core")
+    val core: Any,
+    @SerializedName("user")
     val user: TrackerUser?,
-    @SerialName("application")
+    @SerializedName("application")
     val application: TrackerApps?,
-    @SerialName("network")
+    @SerializedName("network")
     val network: TrackerNetwork?,
-    @SerialName("marketing")
+    @SerializedName("marketing")
     val marketing: InstallReferer?
 )

@@ -1,6 +1,13 @@
 package id.co.edtslib.tracker.data
 
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
+import com.google.gson.stream.MalformedJsonException
+import okio.BufferedSource
 import retrofit2.Response
+import java.net.ConnectException
+import java.net.UnknownHostException
+import java.nio.charset.Charset
 
 abstract class BaseDataSource {
 

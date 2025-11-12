@@ -24,9 +24,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import id.co.edtslib.tracker.util.TrackerHiltUtil.getTracker
-import id.co.edtslib.tracker.util.toSafeJsonElement
 import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.serialization.json.JsonElement
 import kotlin.collections.plus
 
 /**
@@ -40,7 +38,7 @@ fun <T> TrackerLazyColumn(
     listData: List<T>,
     enableImpressionTracking: Boolean = false,
     trackerCategory: String? = null,
-    trackerMapper: ((JsonElement) -> JsonElement)? = null,
+    trackerMapper: ((T) -> String)? = null,
     contentPadding: PaddingValues = PaddingValues(0.dp),
     reverseLayout: Boolean = false,
     verticalArrangement: Arrangement.Vertical =
@@ -56,7 +54,7 @@ fun <T> TrackerLazyColumn(
     val listState = if (enableImpressionTracking){
         rememberImpressionTracker(
             category = trackerCategory.orEmpty(),
-            items = listData.toSafeJsonElement(),
+            items = listData,
             mapper = trackerMapper
         ) { category, time, data, mapper ->
             getTracker(app).trackImpression(category, time, data, mapper)
@@ -93,17 +91,17 @@ data class ImpressionData<T>(
  * this function is equivalent with [id.co.edtslib.tracker.Tracker.setImpressionRecyclerView]
  */
 @Composable
-private fun rememberImpressionTracker(
+private fun <S, T> rememberImpressionTracker(
     category: String,
-    items: List<JsonElement>,
-    mapper: ((JsonElement) -> JsonElement)? = null,
-    onTrackImpression: (category: String, time: Long, data: List<JsonElement>, mapper: ((JsonElement) -> JsonElement)?) -> Unit
+    items: List<S>,
+    mapper: ((S) -> T)? = null,
+    onTrackImpression: (category: String, time: Long, data: List<*>, mapper: ((S) -> T)?) -> Unit
 ): LazyListState {
     val listState = rememberLazyListState()
 
     var firstImpression by remember { mutableStateOf(-1) }
     var lastImpression by remember { mutableStateOf(-1) }
-    var pendingImpressions by remember { mutableStateOf<List<ImpressionData<JsonElement>>>(emptyList()) }
+    var pendingImpressions by remember { mutableStateOf<List<ImpressionData<S>>>(emptyList()) }
 
     // Track visible items when scrolling stops
     LaunchedEffect(listState.isScrollInProgress) {
@@ -139,7 +137,7 @@ private fun rememberImpressionTracker(
                         lastImpression = last
 
                         // Collect visible items
-                        val visibleItems = mutableListOf<JsonElement>()
+                        val visibleItems = mutableListOf<S>()
                         for (i in first..last) {
                             if (i in items.indices) {
                                 visibleItems.add(items[i])

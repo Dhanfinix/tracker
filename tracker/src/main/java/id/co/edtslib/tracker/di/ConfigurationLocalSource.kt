@@ -2,8 +2,9 @@ package id.co.edtslib.tracker.di
 
 import android.app.Application
 import android.content.SharedPreferences
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 import id.co.edtslib.tracker.data.Configuration
-import kotlinx.serialization.json.Json
 
 class ConfigurationLocalSource(sharedPreferences: SharedPreferences, app: Application) :
     LocalDataSource<Configuration>(sharedPreferences) {
@@ -11,7 +12,7 @@ class ConfigurationLocalSource(sharedPreferences: SharedPreferences, app: Applic
 
     override fun getKeyName(): String = "trackerConfiguration"
     override fun getValue(json: String): Configuration =
-        Json.decodeFromString(Configuration.serializer(), json)
+        Gson().fromJson(json, object : TypeToken<Configuration>() {}.type)
 
     override fun save(data: Configuration?) {
         configuration = data

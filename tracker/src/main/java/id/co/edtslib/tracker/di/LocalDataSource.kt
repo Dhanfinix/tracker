@@ -3,8 +3,8 @@ package id.co.edtslib.tracker.di
 import android.content.SharedPreferences
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.asFlow
+import com.google.gson.Gson
 import kotlinx.coroutines.flow.Flow
-import kotlinx.serialization.json.Json
 import java.util.*
 
 abstract class LocalDataSource<T>(private val sharedPreferences: SharedPreferences) {
@@ -20,10 +20,7 @@ abstract class LocalDataSource<T>(private val sharedPreferences: SharedPreferenc
 
             val editor: SharedPreferences.Editor = sharedPreferences.edit()
 
-            editor.putString(
-                getKeyName(),
-                Json.encodeToString(data)
-            )
+            editor.putString(getKeyName(), Gson().toJson(data))
             if (expiredInterval() > 0) {
                 editor.putLong(getKeyTimeName(), Date().time)
             }

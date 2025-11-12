@@ -2,12 +2,12 @@ package id.co.edtslib.tracker.di
 
 import android.app.Application
 import android.content.SharedPreferences
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 import id.co.edtslib.tracker.Tracker
 import id.co.edtslib.tracker.data.TrackerApps
 import id.co.edtslib.tracker.data.TrackerData
 import id.co.edtslib.tracker.data.TrackerDataList
-import kotlinx.serialization.builtins.ListSerializer
-import kotlinx.serialization.json.Json
 import java.lang.Exception
 
 class TrackerLocalDataSource(
@@ -15,8 +15,7 @@ class TrackerLocalDataSource(
     app: Application,
 ): LocalDataSource<List<TrackerData>>(sharedPreferences) {
     override fun getKeyName(): String = "trackers"
-    override fun getValue(json: String): List<TrackerData> =
-        Json.decodeFromString(ListSerializer(TrackerData.serializer()), json)
+    override fun getValue(json: String): List<TrackerData> = Gson().fromJson(json, object : TypeToken<List<TrackerData>>() {}.type)
 
     val apps = TrackerApps.create(app.applicationContext, Tracker.appVersion)
     fun add(trackerData: TrackerDataList) {

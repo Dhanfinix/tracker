@@ -5,28 +5,26 @@ import android.content.Context
 import android.content.res.Resources
 import android.os.Build
 import android.provider.Settings
+import com.google.gson.annotations.SerializedName
 import id.co.edtslib.tracker.R
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
 import java.util.*
 
-@Serializable
 data class TrackerApps (
-    @SerialName("os_name")
+    @SerializedName("os_name")
     val osName: String,
-    @SerialName("os_version")
+    @SerializedName("os_version")
     val osVersion: String,
-    @SerialName("device_class")
+    @SerializedName("device_class")
     val deviceClassName: String,
-    @SerialName("device_family")
+    @SerializedName("device_family")
     val deviceFamilyName: String,
-    @SerialName("os_timezone")
+    @SerializedName("os_timezone")
     val osTimeZone: String,
-    @SerialName("app_version")
+    @SerializedName("app_version")
     val appVersion: String,
-    @SerialName("device_id")
+    @SerializedName("device_id")
     val deviceId: String?,
-    @SerialName("source_name")
+    @SerializedName("source_name")
     val sourceName: String?
 
 ) {

@@ -1,12 +1,10 @@
 package id.co.edtslib.tracker.data
 
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
+import com.google.gson.annotations.SerializedName
 
-@Serializable
 data class TrackerResponse (
-    @SerialName("request")
+    @SerializedName("request")
     val request: String,
-    @SerialName("response")
+    @SerializedName("response")
     val response: String?
 )

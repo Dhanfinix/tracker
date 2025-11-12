@@ -1,25 +1,23 @@
 package id.co.edtslib.tracker.data
 
 import android.annotation.SuppressLint
+import com.google.gson.annotations.SerializedName
 import id.co.edtslib.tracker.util.ConnectivityUtil
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
 
-@Serializable
 data class TrackerNetwork (
-    @SerialName("ip_address")
+    @SerializedName("ip_address")
     val ipAddress: String?,
-    @SerialName("network_isp")
+    @SerializedName("network_isp")
     val networkIsp: String?,
-    @SerialName("country")
+    @SerializedName("country")
     val country: String?,
-    @SerialName("city")
+    @SerializedName("city")
     val city: String?,
-    @SerialName("zipcode")
+    @SerializedName("zipcode")
     val zipcode: String?,
-    @SerialName("latitude")
+    @SerializedName("latitude")
     val latitude: Double?,
-    @SerialName("longitude")
+    @SerializedName("longitude")
     val longitude: Double?
 
 ) {

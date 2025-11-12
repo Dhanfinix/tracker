@@ -1,13 +1,9 @@
 package id.co.edtslib.tracker.di
 
-import android.util.Log
+import com.google.gson.Gson
 import id.co.edtslib.tracker.Tracker
 import id.co.edtslib.tracker.data.*
-import id.co.edtslib.tracker.util.toSafeJsonElement
 import kotlinx.coroutines.flow.flow
-import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.JsonElement
-import kotlinx.serialization.json.encodeToJsonElement
 import java.util.*
 import javax.inject.Inject
 
@@ -101,7 +97,7 @@ class TrackerRepository @Inject constructor(
             pageViewId = Tracker.currentPageId,
             service = configurationLocalSource.getService() ?: "")
         val trackerData = TrackerData(
-            core = Json.encodeToJsonElement(trackerCore),
+            core = trackerCore,
             user = TrackerUser.create(configurationLocalSource.getSessionId(),
                 configurationLocalSource.getUserId()),
             application = localSource.apps,
@@ -131,8 +127,7 @@ class TrackerRepository @Inject constructor(
         val network = TrackerNetwork.create(configurationLocalSource.getLatitude(),
             configurationLocalSource.getLongitude())
 
-        return TrackerData(
-            core = Json.encodeToJsonElement(false),
+        return TrackerData(core = false,
             user = user,
             application = application,
             marketing = marketing,
@@ -154,7 +149,7 @@ class TrackerRepository @Inject constructor(
             service = service ?: ""
         )
         val trackerData = TrackerData(
-            core = Json.encodeToJsonElement(trackerCore),
+            core = trackerCore,
             user = TrackerUser.create(configurationLocalSource.getSessionId(),
                 configurationLocalSource.getUserId()),
             application = localSource.apps,
@@ -173,14 +168,14 @@ class TrackerRepository @Inject constructor(
         when (response.status) {
             Result.Status.SUCCESS -> emit(
                 TrackerResponse(
-                    Json.encodeToString(trackerData),
+                    Gson().toJson(trackerData),
                     response.data
                 )
             )
             Result.Status.ERROR, Result.Status.UNAUTHORIZED -> {
                 localSource.add(trackerDataList)
                 emit(
-                    TrackerResponse(Json.encodeToString(trackerData), null)
+                    TrackerResponse(Gson().toJson(trackerData), null)
                 )
             }
             else -> {
@@ -188,13 +183,13 @@ class TrackerRepository @Inject constructor(
         }
     }
 
-    override fun trackPageDetail(detail: JsonElement?) = flow {
+    override fun trackPageDetail(detail: Any?) = flow {
         val trackerCore = TrackerPageDetailCore.create(
             eventId = configurationLocalSource.getEventId(),
             details = detail,
             service = configurationLocalSource.getService() ?: "")
         val trackerData = TrackerData(
-            core = Json.encodeToJsonElement(trackerCore),
+            core = trackerCore,
             user = TrackerUser.create(configurationLocalSource.getSessionId(),
                 configurationLocalSource.getUserId()),
             application = localSource.apps,
@@ -206,18 +201,18 @@ class TrackerRepository @Inject constructor(
 
         val response = remoteSource.send(trackerDataList)
         when(response.status) {
-            Result.Status.SUCCESS -> emit(TrackerResponse(Json.encodeToString(trackerData), response.data))
+            Result.Status.SUCCESS -> emit(TrackerResponse(Gson().toJson(trackerData), response.data))
             Result.Status.ERROR, Result.Status.UNAUTHORIZED -> {
                 localSource.add(trackerDataList)
                 emit(
-                    TrackerResponse(Json.encodeToString(trackerData), null)
+                    TrackerResponse(Gson().toJson(trackerData), null)
                 )
             }
             else -> {}
         }
     }
 
-    override fun trackClick(name: String, category: String?, url: String?, details: JsonElement?) = flow {
+    override fun trackClick(name: String, category: String?, url: String?, details: Any?) = flow {
         val prevService = configurationLocalSource.getService()
         val trackerCore = TrackerClickLinkCore.create(
             eventId = configurationLocalSource.getEventId(),
@@ -227,7 +222,7 @@ class TrackerRepository @Inject constructor(
             details = details,
             service = prevService ?: "")
         val trackerData = TrackerData(
-            core = Json.encodeToJsonElement(trackerCore),
+            core = trackerCore,
             user = TrackerUser.create(configurationLocalSource.getSessionId(),
                 configurationLocalSource.getUserId()),
             application = localSource.apps,
@@ -239,11 +234,11 @@ class TrackerRepository @Inject constructor(
 
         val response = remoteSource.send(trackerDataList)
         when(response.status) {
-            Result.Status.SUCCESS -> emit(TrackerResponse(Json.encodeToString(trackerData), response.data))
+            Result.Status.SUCCESS -> emit(TrackerResponse(Gson().toJson(trackerData), response.data))
             Result.Status.ERROR, Result.Status.UNAUTHORIZED -> {
                 localSource.add(trackerDataList)
                 emit(
-                    TrackerResponse(Json.encodeToString(trackerData), null)
+                    TrackerResponse(Gson().toJson(trackerData), null)
                 )
             }
             else -> {}
@@ -257,7 +252,7 @@ class TrackerRepository @Inject constructor(
             category = category,
             service = configurationLocalSource.getService() ?: "")
         val trackerData = TrackerData(
-            core = Json.encodeToJsonElement(trackerCore),
+            core = trackerCore,
             user = TrackerUser.create(configurationLocalSource.getSessionId(),
                 configurationLocalSource.getUserId()),
             network = TrackerNetwork.create(configurationLocalSource.getLatitude(),
@@ -269,11 +264,11 @@ class TrackerRepository @Inject constructor(
 
         val response = remoteSource.send(trackerDataList)
         when(response.status) {
-            Result.Status.SUCCESS -> emit(TrackerResponse(Json.encodeToString(trackerData), response.data))
+            Result.Status.SUCCESS -> emit(TrackerResponse(Gson().toJson(trackerData), response.data))
             Result.Status.ERROR, Result.Status.UNAUTHORIZED -> {
                 localSource.add(trackerDataList)
                 emit(
-                    TrackerResponse(Json.encodeToString(trackerData), null)
+                    TrackerResponse(Gson().toJson(trackerData), null)
                 )
             }
             else -> {}
@@ -286,7 +281,7 @@ class TrackerRepository @Inject constructor(
             sortType = sortType,
             service = configurationLocalSource.getService() ?: "")
         val trackerData = TrackerData(
-            core = Json.encodeToJsonElement(trackerCore),
+            core = trackerCore,
             user = TrackerUser.create(configurationLocalSource.getSessionId(),
                 configurationLocalSource.getUserId()),
             application = localSource.apps,
@@ -298,44 +293,35 @@ class TrackerRepository @Inject constructor(
 
         val response = remoteSource.send(trackerDataList)
         when(response.status) {
-            Result.Status.SUCCESS -> emit(TrackerResponse(Json.encodeToString(trackerData), response.data))
+            Result.Status.SUCCESS -> emit(TrackerResponse(Gson().toJson(trackerData), response.data))
             Result.Status.ERROR, Result.Status.UNAUTHORIZED -> {
                 localSource.add(trackerDataList)
                 emit(
-                    TrackerResponse(Json.encodeToString(trackerData), null)
+                    TrackerResponse(Gson().toJson(trackerData), null)
                 )
             }
             else -> {}
         }
     }
 
-    override fun trackImpression(
-        category: String,
-        time: Long,
-        data: List<JsonElement>,
-        mapper: ((data: JsonElement) -> JsonElement?)?
-    ) = flow {
-        val mappedData = if (mapper != null) {
-            data.mapNotNull { element ->
-                try {
-                    mapper.invoke(element)
-                } catch (e: Exception) {
-                    Log.e("TrackerRepo", "Mapper failed for element: ${e.message}")
-                    null
-                }
+    override fun <S, T> trackImpression(category: String, time: Long, data: List<*>, mapper: ((data: S) -> T)?) = flow {
+        val mappedData = mutableListOf<T>()
+        if (mapper != null) {
+            for (d in data) {
+
+                val newD = mapper.invoke(d as S)
+                if (newD != null) mappedData.add(newD)
             }
-        } else {
-            data
         }
         val trackerCore = TrackerImpressionCore.create(
             eventId = configurationLocalSource.getEventId(),
             time = time,
             category= category,
-            data = mappedData,
+            data = if (mapper != null) mappedData else data,
             service = configurationLocalSource.getService() ?: ""
         )
         val trackerData = TrackerData(
-            core = Json.encodeToJsonElement(trackerCore),
+            core = trackerCore,
             user = TrackerUser.create(configurationLocalSource.getSessionId(),
                 configurationLocalSource.getUserId()),
             application = localSource.apps,
@@ -347,11 +333,11 @@ class TrackerRepository @Inject constructor(
 
         val response = remoteSource.send(trackerDataList)
         when(response.status) {
-            Result.Status.SUCCESS -> emit(TrackerResponse(Json.encodeToString(trackerData), response.data))
+            Result.Status.SUCCESS -> emit(TrackerResponse(Gson().toJson(trackerData), response.data))
             Result.Status.ERROR, Result.Status.UNAUTHORIZED -> {
                 localSource.add(trackerDataList)
                 emit(
-                    TrackerResponse(Json.encodeToString(trackerData), null)
+                    TrackerResponse(Gson().toJson(trackerData), null)
                 )
             }
             else -> {}
@@ -363,18 +349,28 @@ class TrackerRepository @Inject constructor(
         category: String,
         status: Boolean,
         reason: String?,
-        details: JsonElement?
+        details: Any?
     ) = flow {
+        val map = if (details is MutableMap<*, *>) {
+            details.toMap()
+        }
+        else
+            if (details is MutableList<*>) {
+                details.toList()
+            }
+            else {
+                null
+            }
         val trackerCore = TrackerSubmissionCore.create(
             eventId = configurationLocalSource.getEventId(),
             label = name,
             category = category,
             status = status,
             reason = reason,
-            details = details,
+            details = map ?: details,
             service = configurationLocalSource.getService() ?: "")
         val trackerData = TrackerData(
-            core = Json.encodeToJsonElement(trackerCore),
+            core = trackerCore,
             user = TrackerUser.create(configurationLocalSource.getSessionId(),
                 configurationLocalSource.getUserId()),
             application = localSource.apps,
@@ -387,11 +383,11 @@ class TrackerRepository @Inject constructor(
         try {
             val response = remoteSource.send(trackerDataList)
             when(response.status) {
-                Result.Status.SUCCESS -> emit(TrackerResponse(Json.encodeToString(trackerData), response.data))
+                Result.Status.SUCCESS -> emit(TrackerResponse(Gson().toJson(trackerData), response.data))
                 Result.Status.ERROR, Result.Status.UNAUTHORIZED -> {
                     localSource.add(trackerDataList)
                     emit(
-                        TrackerResponse(Json.encodeToString(trackerData), null)
+                        TrackerResponse(Gson().toJson(trackerData), null)
                     )
                 }
                 else -> {}
@@ -404,14 +400,14 @@ class TrackerRepository @Inject constructor(
     }
 
     override fun trackDisplayedItems(
-        data: MutableList<JsonElement>
+        data: MutableList<Any>
     ) = flow {
         val trackerCore = TrackerDisplayedItemCore.create(
             eventId = configurationLocalSource.getEventId(),
             data = data,
             service = configurationLocalSource.getService() ?: "")
         val trackerData = TrackerData(
-            core = Json.encodeToJsonElement(trackerCore),
+            core = trackerCore,
             user = TrackerUser.create(configurationLocalSource.getSessionId(),
                 configurationLocalSource.getUserId()),
             application = localSource.apps,
@@ -423,11 +419,11 @@ class TrackerRepository @Inject constructor(
 
         val response = remoteSource.send(trackerDataList)
         when(response.status) {
-            Result.Status.SUCCESS -> emit(TrackerResponse(Json.encodeToString(trackerData), response.data))
+            Result.Status.SUCCESS -> emit(TrackerResponse(Gson().toJson(trackerData), response.data))
             Result.Status.ERROR, Result.Status.UNAUTHORIZED -> {
                 localSource.add(trackerDataList)
                 emit(
-                    TrackerResponse(Json.encodeToString(trackerData), null)
+                    TrackerResponse(Gson().toJson(trackerData), null)
                 )
             }
             else -> {}
@@ -436,7 +432,7 @@ class TrackerRepository @Inject constructor(
 
     override fun trackSearch(
         keyword: String,
-        details: JsonElement?
+        details: Any?
     ) = flow {
         val trackerCore = TrackerSearchCore.create(
             eventId = configurationLocalSource.getEventId(),
@@ -444,7 +440,7 @@ class TrackerRepository @Inject constructor(
             details = details,
             service = configurationLocalSource.getService() ?: "")
         val trackerData = TrackerData(
-            core = Json.encodeToJsonElement(trackerCore),
+            core = trackerCore,
             user = TrackerUser.create(configurationLocalSource.getSessionId(),
                 configurationLocalSource.getUserId()),
             application = localSource.apps,
@@ -456,11 +452,11 @@ class TrackerRepository @Inject constructor(
 
         val response = remoteSource.send(trackerDataList)
         when(response.status) {
-            Result.Status.SUCCESS -> emit(TrackerResponse(Json.encodeToString(trackerData), response.data))
+            Result.Status.SUCCESS -> emit(TrackerResponse(Gson().toJson(trackerData), response.data))
             Result.Status.ERROR, Result.Status.UNAUTHORIZED -> {
                 localSource.add(trackerDataList)
                 emit(
-                    TrackerResponse(Json.encodeToString(trackerData), null)
+                    TrackerResponse(Gson().toJson(trackerData), null)
                 )
             }
             else -> {}
