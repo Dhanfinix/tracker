@@ -27,7 +27,7 @@ import javax.inject.Inject
  * using CoroutineScope(Dispatchers.IO), ensuring background execution without lifecycle coupling.
  */
 
-open class TrackerController @Inject constructor(
+open class TrackerController(
     private val trackerUseCase: TrackerUseCase
 ) {
     fun createSession() = trackerUseCase.createSession().asLiveData()

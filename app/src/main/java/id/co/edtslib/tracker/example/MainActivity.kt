@@ -8,12 +8,11 @@ import dagger.hilt.android.AndroidEntryPoint
 import id.co.edtslib.edtsds.list.menu.MenuListView
 import id.co.edtslib.tracker.Tracker
 import id.co.edtslib.tracker.data.TrackerFilterDetail
+import id.co.edtslib.tracker.di.manual.TrackerFactory.getTracker
 import javax.inject.Inject
 
-@AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
-    @Inject
-    lateinit var tracker: Tracker
+    private var tracker = getTracker()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

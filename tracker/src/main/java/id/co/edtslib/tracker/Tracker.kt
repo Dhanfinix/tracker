@@ -1,5 +1,6 @@
 package id.co.edtslib.tracker
 
+import android.app.Application
 import android.content.Intent
 import android.util.Patterns
 import androidx.core.net.toUri
@@ -15,6 +16,7 @@ import id.co.edtslib.tracker.data.InstallReferer
 import id.co.edtslib.tracker.data.TrackerData
 import id.co.edtslib.tracker.data.TrackerFilterDetail
 import id.co.edtslib.tracker.di.TrackerController
+import id.co.edtslib.tracker.di.manual.UseCaseFactory.getTrackerUseCase
 import java.util.Date
 import javax.inject.Inject
 
@@ -46,9 +48,8 @@ import javax.inject.Inject
  *
  * @param controller The injected [TrackerController] that handles actual tracking logic.
  */
-class Tracker @Inject constructor() {
-    @Inject
-    lateinit var controller: TrackerController
+class Tracker {
+    private var controller = app?.let { TrackerController(getTrackerUseCase(it)) }
 
     data class ImpressionData(
         val data: List<Any>,
@@ -60,6 +61,9 @@ class Tracker @Inject constructor() {
 
     companion object {
         const val PLACEHOLDER_TRACKER_URL = "https://placeholder-tracker-url.com"
+
+        var app: Application? = null
+            private set
 
         var isInitialized: Boolean = false
             private set
@@ -94,11 +98,13 @@ class Tracker @Inject constructor() {
          * @param isLegacy Whether to enable legacy tracking behavior.
          */
         fun init(
+            app: Application,
             baseUrl: String,
             token: String,
             path: String = "apps-tracker-gateway",
             isLegacy: Boolean = false,
         ) {
+            this.app = app
             this.baseUrl = baseUrl
             this.token = token
             this.path = path
@@ -144,7 +150,7 @@ class Tracker @Inject constructor() {
 
     fun getInstallReferer(){
         checkInitialization("getInstallReferer"){
-            controller.getInstallReferer()
+            controller?.getInstallReferer()
         }
     }
 
@@ -185,47 +191,47 @@ class Tracker @Inject constructor() {
     fun checkInstallReferrer(utm_raw: String?, intent: Intent?) {
         checkInitialization("checkInstallReferrer"){
             if (intent?.data?.getQueryParameter("utm_source") != null) {
-                controller.setInstallReferer(InstallReferer(intent.data?.toString()))
+                controller?.setInstallReferer(InstallReferer(intent.data?.toString()))
             } else {
-                controller.setInstallReferer(InstallReferer(utm_raw))
+                controller?.setInstallReferer(InstallReferer(utm_raw))
             }
         }
     }
 
     fun setUserId(userId: Long) {
         checkInitialization("setUserId"){
-            controller.setUserId(userId)
+            controller?.setUserId(userId)
         }
     }
 
     fun setLatLng(lat: Double, lng: Double) {
         checkInitialization("setLatLng"){
-            controller.setLatLng(lat, lng)
+            controller?.setLatLng(lat, lng)
         }
     }
 
     fun getService() {
         checkInitialization("getService"){
-            controller.getService()
+            controller?.getService()
         }
     }
 
     fun setService(service: String) {
         checkInitialization("setService"){
-            controller.setService(service)
+            controller?.setService(service)
         }
     }
 
     fun trackPage(pageName: String, pageId: String, pageUrlPath: String = "") {
         checkInitialization("trackPage"){
-            controller.trackPage(pageName, pageId, pageUrlPath)
+            controller?.trackPage(pageName, pageId, pageUrlPath)
             resumePage(pageName, pageId)
         }
     }
 
     fun trackPageDetail(detail: Any?) {
         checkInitialization("trackPageDetail"){
-            controller.trackPageDetail(detail)
+            controller?.trackPageDetail(detail)
         }
     }
 
@@ -236,25 +242,25 @@ class Tracker @Inject constructor() {
         details: Any? = null
     ) {
         checkInitialization("trackClick"){
-            controller.trackClick(name, category, url, details)
+            controller?.trackClick(name, category, url, details)
         }
     }
 
     fun trackFilters(filters: List<TrackerFilterDetail>, category: String = "") {
         checkInitialization("trackFilters"){
-            controller.trackFilters(filters, category)
+            controller?.trackFilters(filters, category)
         }
     }
 
     fun trackSort(sortType: String) {
         checkInitialization("trackSort"){
-            controller.trackSort(sortType)
+            controller?.trackSort(sortType)
         }
     }
 
     fun trackSubmissionSuccess(name: String, category: String, details: Any? = null) {
         checkInitialization("trackSubmissionSuccess"){
-            controller.trackSubmission(name, category, true, "", details)
+            controller?.trackSubmission(name, category, true, "", details)
         }
     }
 
@@ -265,7 +271,7 @@ class Tracker @Inject constructor() {
         details: Any? = null
     ) {
         checkInitialization("trackSubmissionFailed"){
-            controller.trackSubmission(name, category, false, reason, details)
+            controller?.trackSubmission(name, category, false, reason, details)
         }
     }
 
@@ -275,7 +281,7 @@ class Tracker @Inject constructor() {
         mapper: ((data: S) -> T)? = null
     ) {
         checkInitialization("trackImpression"){
-            controller.trackImpression<S, T>(category, Date().time, data, mapper)
+            controller?.trackImpression<S, T>(category, Date().time, data, mapper)
         }
     }
 
@@ -286,45 +292,45 @@ class Tracker @Inject constructor() {
         mapper: ((data: S) -> T)? = null
     ) {
         checkInitialization("trackImpression"){
-            controller.trackImpression<S, T>(category, time, data, mapper)
+            controller?.trackImpression<S, T>(category, time, data, mapper)
         }
     }
 
     fun trackDisplayedItems(data: MutableList<Any>) {
         checkInitialization("trackDisplayedItems"){
-            controller.trackDisplayedItems(data)
+            controller?.trackDisplayedItems(data)
         }
     }
 
     fun trackSearch(keyword: String, details: Any? = null) {
         checkInitialization("trackSearch"){
-            controller.trackSearch(keyword, details)
+            controller?.trackSearch(keyword, details)
         }
     }
 
     fun trackOpenApplication() {
         checkInitialization("trackOpenApplication"){
-            controller.createSession().observeForever {
-                controller.trackOpenApplication()
+            controller?.createSession()?.observeForever {
+                controller?.trackOpenApplication()
             }
         }
     }
 
     fun trackCloseApplication() {
         checkInitialization("trackCloseApplication"){
-            controller.trackCloseApplication()
+            controller?.trackCloseApplication()
         }
     }
 
     fun trackResumeApplication() {
         checkInitialization("trackResumeApplication"){
-            controller.trackResumeApplication()
+            controller?.trackResumeApplication()
         }
     }
 
     fun trackMinimizeApplication() {
         checkInitialization("trackMinimizeApplication"){
-            controller.trackMinimizeApplication()
+            controller?.trackMinimizeApplication()
         }
     }
 
@@ -336,7 +342,7 @@ class Tracker @Inject constructor() {
     fun getData(): TrackerData? {
         var data : TrackerData? = null
         checkInitialization("trackMinimizeApplication"){
-            data = controller.getData()
+            data = controller?.getData()
         }
         return data
     }
@@ -354,7 +360,7 @@ class Tracker @Inject constructor() {
     fun getPriorPageName(): String? {
         var priorPageName :String? = null
         checkInitialization("getPriorPageName"){
-            priorPageName = controller.getPriorPageName()
+            priorPageName = controller?.getPriorPageName()
         }
         return priorPageName
     }

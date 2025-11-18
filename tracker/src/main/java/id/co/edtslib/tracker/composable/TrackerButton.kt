@@ -1,6 +1,5 @@
 package id.co.edtslib.tracker.composable
 
-import android.app.Application
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.PaddingValues
@@ -12,8 +11,7 @@ import androidx.compose.material3.ButtonElevation
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Shape
-import androidx.compose.ui.platform.LocalContext
-import id.co.edtslib.tracker.util.TrackerHiltUtil.getTracker
+import id.co.edtslib.tracker.di.manual.TrackerFactory.getTracker
 
 /**
  * A customizable button composable with an optional click tracker.
@@ -39,11 +37,10 @@ fun TrackerButton(
     interactionSource: MutableInteractionSource? = null,
     content: @Composable RowScope.() -> Unit,
 ) {
-    val app = LocalContext.current.applicationContext as Application
     Button(
         onClick = {
             if (enableClickTracker){
-                getTracker(app).trackClick(
+                getTracker().trackClick(
                     trackerTitle.orEmpty(),
                     trackerCategory,
                     trackerUrl,

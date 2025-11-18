@@ -1,6 +1,5 @@
 package id.co.edtslib.tracker.composable
 
-import android.app.Application
 import android.util.Log
 import androidx.compose.foundation.OverscrollEffect
 import androidx.compose.foundation.gestures.FlingBehavior
@@ -21,9 +20,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import id.co.edtslib.tracker.util.TrackerHiltUtil.getTracker
+import id.co.edtslib.tracker.di.manual.TrackerFactory.getTracker
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlin.collections.plus
 
@@ -50,14 +48,13 @@ fun <T> TrackerLazyColumn(
     getListState: ((LazyListState)-> Unit)? = null,
     content: LazyListScope.() -> Unit,
 ) {
-    val app = LocalContext.current.applicationContext as Application
     val listState = if (enableImpressionTracking){
         rememberImpressionTracker(
             category = trackerCategory.orEmpty(),
             items = listData,
             mapper = trackerMapper
         ) { category, time, data, mapper ->
-            getTracker(app).trackImpression(category, time, data, mapper)
+            getTracker().trackImpression(category, time, data, mapper)
             Log.i("EdtsLazyColumn", "Tracked: $category - $data at $time")
         }
     } else {
