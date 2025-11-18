@@ -161,4 +161,5 @@ open class TrackerController @Inject constructor(
 
     fun getData() = trackerUseCase.getData()
 
+    fun getPriorPageName() = trackerUseCase.getPriorPageName()
 }

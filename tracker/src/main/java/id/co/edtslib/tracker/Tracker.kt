@@ -341,6 +341,24 @@ class Tracker @Inject constructor() {
         return data
     }
 
+    /**
+     * Returns the actual previous page name before the current one was tracked.
+     *
+     * Unlike [id.co.edtslib.tracker.di.ConfigurationLocalSource.getPreviousPageName],
+     * which may reflect the current page due to overwrite during [id.co.edtslib.tracker.Tracker.trackPage],
+     * this method preserves the last known page before tracking occurred.
+     *
+     * Useful for scenarios where page context is needed outside the tracking lifecycle,
+     * such as in Sentinel.
+     */
+    fun getPriorPageName(): String? {
+        var priorPageName :String? = null
+        checkInitialization("getPriorPageName"){
+            priorPageName = controller.getPriorPageName()
+        }
+        return priorPageName
+    }
+
     fun <S, T> setImpressionRecyclerView(
         category: String,
         recyclerView: RecyclerView,
