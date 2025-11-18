@@ -1,5 +1,9 @@
 # Changelog
 
+## [2.3.21-0.0.13] - 2025-11-18
+### FEAT
++ Add priorPageName which returns actual previous page name for usage outside of track page
+
 ## [2.3.20-0.0.12] - 2025-11-06
 ### FEAT
 + Add tracker composable for Button and LazyColumn
