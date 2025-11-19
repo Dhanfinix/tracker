@@ -18,24 +18,45 @@ import id.co.edtslib.tracker.data.TrackerFilterDetail
 import id.co.edtslib.tracker.di.TrackerController
 import id.co.edtslib.tracker.di.manual.UseCaseFactory.getTrackerUseCase
 import java.util.Date
+import java.util.WeakHashMap
 import javax.inject.Inject
 
 /**
- * Tracker is a lifecycle-safe, Hilt-managed analytics coordinator responsible for configuring
- * and delegating tracking operations to the injected [TrackerController].
+ * Tracker is a lifecycle-safe analytics coordinator responsible for configuring
+ * and delegating tracking operations to [TrackerController].
  *
- * This class replaces the previous static or ViewModel-based implementation, ensuring proper
- * dependency injection, modularity, and testability. It is designed to be initialized once
- * during application startup via [init], and then injected wherever needed.
+ * This class uses manual dependency injection via factory objects, ensuring proper
+ * modularity, testability, and independence from DI frameworks like Hilt or Dagger.
+ * It is designed to be initialized once during application startup via [init], and
+ * accessed as a singleton through [id.co.edtslib.tracker.di.manual.TrackerFactory].
+ *
+ * ## Initialization
+ * ```kotlin
+ * // In Application.onCreate()
+ * Tracker.init(
+ *     app = this,
+ *     baseUrl = "https://your-tracking-api.com",
+ *     token = "your-auth-token",
+ *     path = "apps-tracker-gateway",  // optional
+ *     isLegacy = false                 // optional
+ * )
+ *
+ * // Access singleton instance
+ * val tracker = TrackerFactory.getTracker()
+ * ```
+ *
+ * ## Usage
+ * After initialization, use the singleton instance to perform tracking operations:
+ * ```kotlin
+ * val tracker = TrackerFactory.getTracker()
+ * tracker.trackPage("Home", "home_screen")
+ * tracker.trackClick("buy_button", category = "ecommerce")
+ * tracker.setUserId(12345)
+ * ```
  *
  * ## Configuration
  * The [init] method sets up runtime parameters such as API endpoint, token, and behavior flags.
  * All configuration fields are exposed as read-only properties to prevent accidental mutation.
- *
- * ## Usage
- * - Call [init] once during app startup (e.g., in `Application.onCreate()`).
- * - Inject [Tracker] into any Hilt-aware component (Activity, Fragment, Service, etc.).
- * - Use instance methods to perform tracking operations via the controller.
  *
  * ## Properties
  * - [baseUrl], [token], [path], [isLegacy], [resend], [appVersion]: runtime configuration
@@ -44,9 +65,10 @@ import javax.inject.Inject
  * - [isInitialized]: guards against premature usage
  *
  * ## Internal State
- * - [firstImpression], [lastImpression]: used for impression tracking boundaries
+ * - [impressionTracking]: per-RecyclerView scroll position tracking for impression detection
  *
- * @param controller The injected [TrackerController] that handles actual tracking logic.
+ * @see id.co.edtslib.tracker.di.manual.TrackerFactory
+ * @see TrackerController
  */
 class Tracker {
     private var controller = app?.let { TrackerController(getTrackerUseCase(it)) }
@@ -56,8 +78,11 @@ class Tracker {
         val time: Long
     )
 
-    private var firstImpression = -1
-    private var lastImpression = -1
+    /** The WeakHashMap will automatically remove the RecyclerView entry
+     * when it's no longer referenced elsewhere and gets garbage collected.
+     * This needed, because we encourage singleton Tracker instance.
+      */
+    private val impressionTracking = WeakHashMap<RecyclerView, Pair<Int, Int>>()
 
     companion object {
         const val PLACEHOLDER_TRACKER_URL = "https://placeholder-tracker-url.com"
@@ -370,8 +395,8 @@ class Tracker {
         recyclerView: RecyclerView,
         mapper: ((data: S) -> T)? = null
     ) {
-        firstImpression = -1
-        lastImpression = -1
+        // Initialize tracking state for this specific RecyclerView
+        impressionTracking[recyclerView] = Pair(-1, -1)
 
         recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
@@ -400,7 +425,8 @@ class Tracker {
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                 super.onScrolled(recyclerView, dx, dy)
 
-                if ((recyclerView.layoutManager is LinearLayoutManager || recyclerView.layoutManager is StaggeredGridLayoutManager) && (recyclerView.adapter is BaseRecyclerViewAdapter<*, *> || recyclerView.adapter is BaseRecyclerView2)) {
+                if ((recyclerView.layoutManager is LinearLayoutManager || recyclerView.layoutManager is StaggeredGridLayoutManager) &&
+                    (recyclerView.adapter is BaseRecyclerViewAdapter<*, *> || recyclerView.adapter is BaseRecyclerView2)) {
 
                     val first: Int
                     val last: Int
@@ -409,15 +435,17 @@ class Tracker {
                         first = layoutManager.findFirstVisibleItemPosition()
                         last = layoutManager.findLastVisibleItemPosition()
                     } else {
-                        val layoutManager =
-                            recyclerView.layoutManager as StaggeredGridLayoutManager
+                        val layoutManager = recyclerView.layoutManager as StaggeredGridLayoutManager
                         first = layoutManager.findFirstVisibleItemPositions(null)[0]
                         last = layoutManager.findLastVisibleItemPositions(null)[0]
                     }
 
-                    if (firstImpression != first && lastImpression != last) {
-                        firstImpression = first
-                        lastImpression = last
+                    // Get tracking state for THIS RecyclerView
+                    val (prevFirst, prevLast) = impressionTracking[recyclerView] ?: Pair(-1, -1)
+
+                    if (prevFirst != first && prevLast != last) {
+                        // Update tracking state for THIS RecyclerView
+                        impressionTracking[recyclerView] = Pair(first, last)
 
                         if (recyclerView.adapter is BaseRecyclerViewAdapter<*, *>) {
                             addImpression(

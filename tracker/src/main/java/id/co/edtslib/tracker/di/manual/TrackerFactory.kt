@@ -3,5 +3,6 @@ package id.co.edtslib.tracker.di.manual
 import id.co.edtslib.tracker.Tracker
 
 object TrackerFactory {
-    fun getTracker() = Tracker()
+    private var tracker: Tracker? = null
+    fun getTracker() = tracker ?: Tracker().also { tracker = it  }
 }

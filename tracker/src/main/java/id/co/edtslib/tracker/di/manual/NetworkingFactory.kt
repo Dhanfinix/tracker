@@ -8,7 +8,7 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
 object NetworkingFactory {
-    private val retrofit: Retrofit? = null
+    private var retrofit: Retrofit? = null
 
     fun getRetrofit(): Retrofit = retrofit ?:
         Retrofit.Builder()
@@ -21,5 +21,6 @@ object NetworkingFactory {
             )
             .addConverterFactory(GsonConverterFactory.create(Gson()))
             .build()
+            .also { retrofit = it }
 }
 

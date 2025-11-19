@@ -10,19 +10,29 @@ import id.co.edtslib.tracker.di.manual.MainAppFactory.getTrackerApiService
 import id.co.edtslib.tracker.di.manual.SharedPrefFactory.getSharedPrefs
 
 object RepositoryFactory {
+    private var repository: ITrackerRepository? = null
+    private var remoteDataSource: TrackerRemoteDataSource? = null
+    private var localDataSource: TrackerLocalDataSource? = null
+    private var configLocalDataSource: ConfigurationLocalSource? = null
+
     private fun getTrackerRemoteSource(): TrackerRemoteDataSource {
-        return TrackerRemoteDataSource(getTrackerApiService())
+        return remoteDataSource ?: TrackerRemoteDataSource(
+            getTrackerApiService()
+        ).also { remoteDataSource = it }
     }
 
     private fun getTrackerLocalDataSource(app: Application): TrackerLocalDataSource {
-        return TrackerLocalDataSource(getSharedPrefs(app), app)
+        return localDataSource ?: TrackerLocalDataSource(
+            getSharedPrefs(app), app
+        ).also { localDataSource = it }
     }
 
     fun getTrackerConfigLocalDataSource(app: Application): ConfigurationLocalSource {
-        return ConfigurationLocalSource(getSharedPrefs(app), app)
+        return configLocalDataSource ?: ConfigurationLocalSource(
+            getSharedPrefs(app), app
+        ).also { configLocalDataSource = it }
     }
 
-    private var repository: ITrackerRepository? = null
 
     fun getTrackerRepository(
         app: Application
@@ -31,6 +41,6 @@ object RepositoryFactory {
             getTrackerRemoteSource(),
             getTrackerLocalDataSource(app),
             getTrackerConfigLocalDataSource(app)
-        )
+        ).also { repository = it }
     }
 }
