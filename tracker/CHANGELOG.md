@@ -1,5 +1,10 @@
 # Changelog
 
+## [2.3.21-0.0.14] - 2025-11-19
+### REFACTOR
++ Change Hilt DI to manual DI to achieve zero framework dependency
++ Update README.md to match new usage
+
 ## [2.3.21-0.0.13] - 2025-11-18
 ### FEAT
 + Add priorPageName which returns actual previous page name for usage outside of track page
