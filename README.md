@@ -102,7 +102,7 @@ import id.co.edtslib.tracker.di.manual.TrackerFactory
 
 class MainActivity : AppCompatActivity() {
     
-    private val tracker by lazy { TrackerFactory.getTracker() }
+    private val tracker = TrackerFactory.getTracker()
     
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -342,7 +342,7 @@ class MainActivity : AppCompatActivity() {
 ```kotlin
 class ProductListActivity : AppCompatActivity() {
     
-    private val tracker by lazy { TrackerFactory.getTracker() }
+    private val tracker = TrackerFactory.getTracker()
     
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -403,7 +403,7 @@ class MainActivity : AppCompatActivity() {
 ### After (Manual DI)
 ```kotlin
 class MainActivity : AppCompatActivity() {
-    private val tracker by lazy { TrackerFactory.getTracker() }
+    private val tracker = TrackerFactory.getTracker()
 }
 ```
 
