@@ -1,5 +1,9 @@
 # Changelog
 
+## [2.3.21-0.0.15] - 2025-11-19
+### REMOVE
++ Dagger hilt libs
+
 ## [2.3.21-0.0.14] - 2025-11-19
 ### REFACTOR
 + Change Hilt DI to manual DI to achieve zero framework dependency
