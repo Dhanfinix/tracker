@@ -19,7 +19,6 @@ import id.co.edtslib.tracker.di.TrackerController
 import id.co.edtslib.tracker.di.manual.UseCaseFactory.getTrackerUseCase
 import java.util.Date
 import java.util.WeakHashMap
-import javax.inject.Inject
 
 /**
  * Tracker is a lifecycle-safe analytics coordinator responsible for configuring

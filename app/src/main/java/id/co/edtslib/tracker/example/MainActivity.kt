@@ -4,12 +4,9 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import androidx.appcompat.app.AppCompatActivity
-import dagger.hilt.android.AndroidEntryPoint
 import id.co.edtslib.edtsds.list.menu.MenuListView
-import id.co.edtslib.tracker.Tracker
 import id.co.edtslib.tracker.data.TrackerFilterDetail
 import id.co.edtslib.tracker.di.manual.TrackerFactory.getTracker
-import javax.inject.Inject
 
 class MainActivity : AppCompatActivity() {
     private var tracker = getTracker()

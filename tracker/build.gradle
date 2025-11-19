@@ -2,8 +2,6 @@ plugins {
     id 'com.android.library'
     id 'org.jetbrains.kotlin.android'
     id 'maven-publish'
-    id 'com.google.devtools.ksp'
-    id 'com.google.dagger.hilt.android'
     id 'org.jetbrains.kotlin.plugin.compose'
 }
 
@@ -101,10 +99,6 @@ dependencies {
     api 'androidx.appcompat:appcompat:1.7.1'
     api 'com.google.android.material:material:1.13.0'
     api "androidx.preference:preference-ktx:1.2.1"
-
-    // Hilt
-    implementation "com.google.dagger:hilt-android:2.57.1"
-    ksp "com.google.dagger:hilt-compiler:2.57.1"
 
     // Lifecycle
     api "androidx.lifecycle:lifecycle-livedata-ktx:2.9.4"

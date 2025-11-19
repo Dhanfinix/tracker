@@ -1,9 +1,7 @@
 package id.co.edtslib.tracker.example
 
 import android.app.Application
-import dagger.hilt.android.HiltAndroidApp
 import id.co.edtslib.tracker.Tracker
-import id.co.edtslib.tracker.Tracker.Companion.PLACEHOLDER_TRACKER_URL
 
 class App: Application(){
     override fun onCreate() {
