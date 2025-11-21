@@ -13,10 +13,12 @@ import javax.net.ssl.SSLSession
 import javax.net.ssl.TrustManager
 import javax.net.ssl.X509TrustManager
 
-class UnsafeOkHttpClient() {
+class UnsafeOkHttpClient(
+    private val config: Tracker.TrackerConfig
+) {
     @SuppressLint("CustomX509TrustManager")
     fun get(): OkHttpClient {
-        val interceptor = HttpLoggingInterceptor().apply { level = if (Tracker.debugging)
+        val interceptor = HttpLoggingInterceptor().apply { level = if (config.debugging)
             HttpLoggingInterceptor.Level.BODY else HttpLoggingInterceptor.Level.NONE }
         return try {
             // Create a trust manager that does not validate certificate chains

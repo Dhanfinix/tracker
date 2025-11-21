@@ -5,18 +5,17 @@ import android.os.Handler
 import android.os.Looper
 import androidx.appcompat.app.AppCompatActivity
 import id.co.edtslib.edtsds.list.menu.MenuListView
+import id.co.edtslib.tracker.Tracker
 import id.co.edtslib.tracker.data.TrackerFilterDetail
-import id.co.edtslib.tracker.di.manual.TrackerFactory.getTracker
 
 class MainActivity : AppCompatActivity() {
-    private var tracker = getTracker()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        tracker.trackClick("aaa")
-        tracker.checkInstallReferrer(this)
+        Tracker.trackClick("aaa")
+        Tracker.checkInstallReferrer(this)
 
         val filter = mutableListOf<TrackerFilterDetail>()
         val trackerData = TrackerFilterDetail(
@@ -25,7 +24,7 @@ class MainActivity : AppCompatActivity() {
             listOf("adasd", "gdfgdfgf")
         )
         filter.add(trackerData)
-        tracker.trackFilters(filter, "test")
+        Tracker.trackFilters(filter, "test")
 
         val list = mutableListOf<String>()
         for (i in 0 until 100) {
@@ -35,20 +34,20 @@ class MainActivity : AppCompatActivity() {
 
         val menuListView = findViewById<MenuListView<String>>(R.id.menuListView)
         menuListView.data = list
-        tracker.setImpressionRecyclerView<String?, String>("abah test", menuListView) { imp ->
+        Tracker.setImpressionRecyclerView<String?, String>("abah test", menuListView) { imp ->
             return@setImpressionRecyclerView imp?.let { String.format("%s manipulated", it) } ?: "null"
         }
 
-        tracker.trackImpression<String, String>("", list)
+        Tracker.trackImpression<String, String>("", list)
 
     }
 
     override fun onResume() {
         super.onResume()
         //Tracker.resumePage("testlib8", "testlibaja8")
-        tracker.trackPage("testlib11", "testlib11", "testlib11")
+        Tracker.trackPage("testlib11", "testlib11", "testlib11")
         Handler(Looper.myLooper()!!).postDelayed({
-            tracker.trackSearch("lalali", "Login")
+            Tracker.trackSearch("lalali", "Login")
         }, 3000)
     }
 }

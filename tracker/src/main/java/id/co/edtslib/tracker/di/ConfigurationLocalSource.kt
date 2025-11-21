@@ -1,12 +1,11 @@
 package id.co.edtslib.tracker.di
 
-import android.app.Application
 import android.content.SharedPreferences
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import id.co.edtslib.tracker.data.Configuration
 
-class ConfigurationLocalSource(sharedPreferences: SharedPreferences, app: Application) :
+class ConfigurationLocalSource(sharedPreferences: SharedPreferences) :
     LocalDataSource<Configuration>(sharedPreferences) {
     private var configuration: Configuration? = null
 

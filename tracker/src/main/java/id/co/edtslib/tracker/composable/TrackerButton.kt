@@ -11,7 +11,7 @@ import androidx.compose.material3.ButtonElevation
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Shape
-import id.co.edtslib.tracker.di.manual.TrackerFactory.getTracker
+import id.co.edtslib.tracker.Tracker
 
 /**
  * A customizable button composable with an optional click tracker.
@@ -40,7 +40,7 @@ fun TrackerButton(
     Button(
         onClick = {
             if (enableClickTracker){
-                getTracker().trackClick(
+                Tracker.trackClick(
                     trackerTitle.orEmpty(),
                     trackerCategory,
                     trackerUrl,

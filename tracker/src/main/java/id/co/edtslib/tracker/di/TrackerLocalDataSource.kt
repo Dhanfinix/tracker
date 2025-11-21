@@ -1,6 +1,6 @@
 package id.co.edtslib.tracker.di
 
-import android.app.Application
+import android.content.Context
 import android.content.SharedPreferences
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
@@ -12,14 +12,15 @@ import java.lang.Exception
 
 class TrackerLocalDataSource(
     sharedPreferences: SharedPreferences,
-    app: Application,
+    context: Context,
+    private val config: Tracker.TrackerConfig
 ): LocalDataSource<List<TrackerData>>(sharedPreferences) {
     override fun getKeyName(): String = "trackers"
     override fun getValue(json: String): List<TrackerData> = Gson().fromJson(json, object : TypeToken<List<TrackerData>>() {}.type)
 
-    val apps = TrackerApps.create(app.applicationContext, Tracker.appVersion)
+    val apps = TrackerApps.create(context, config.appVersion)
     fun add(trackerData: TrackerDataList) {
-        if (Tracker.resend) {
+        if (config.resend) {
             try {
                 val cached = getCached()
                 val list = cached?.toMutableList() ?: mutableListOf()

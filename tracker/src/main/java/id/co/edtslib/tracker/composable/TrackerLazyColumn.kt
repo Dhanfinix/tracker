@@ -21,7 +21,7 @@ import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import id.co.edtslib.tracker.di.manual.TrackerFactory.getTracker
+import id.co.edtslib.tracker.Tracker
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlin.collections.plus
 
@@ -54,7 +54,7 @@ fun <T> TrackerLazyColumn(
             items = listData,
             mapper = trackerMapper
         ) { category, time, data, mapper ->
-            getTracker().trackImpression(category, time, data, mapper)
+            Tracker.trackImpression(category, time, data, mapper)
             Log.i("EdtsLazyColumn", "Tracked: $category - $data at $time")
         }
     } else {
