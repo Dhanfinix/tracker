@@ -1,28 +1,32 @@
 # Tracker
 
 ![SlidingButton](https://i.ibb.co/GCcGMwH/edtslibs.png)
+-----
 
-A lightweight, framework-agnostic analytics library for Android with **no DI framework dependencies**. Works seamlessly with any project architecture.
+A lightweight, thread-safe, and framework-agnostic analytics library for Android. Built with a robust **Builder Pattern** and **Manual Dependency Injection**, ensuring zero conflicts with your host app's architecture.
 
 ## Features
 
-✅ **Zero Dependencies** - No DI framework required  
-✅ **Universal Compatibility** - Works with Hilt, Dagger, Koin, or no DI at all  
-✅ **Simple Setup** - Initialize once, use everywhere  
-✅ **Lifecycle Safe** - Built-in lifecycle awareness  
-✅ **Secure Storage** - Automatic encrypted SharedPreferences
+✅ **Zero Transitive Dependencies** - Does not force Koin, Hilt, or Dagger on your app  
+✅ **Thread Safe** - Synchronized singleton initialization and localized state management  
+✅ **Memory Safe** - Automatic handling of `ApplicationContext` and `WeakReferences` for Views  
+✅ **Crash Resistant** - "Loud Logging" instead of runtime crashes if initialized incorrectly  
+✅ **Lifecycle Aware** - Self-cleaning observers and lifecycle-safe context handling  
+✅ **Secure Storage** - Automatic encrypted SharedPreferences with legacy fallback
 
 ## Setup
 
 ### Gradle
 
 Ask author for `github.properties` file
+
 ```properties
 USER_ID=AUTHOR_USER_ID
 ACCESS_TOKEN=AUTHOR_ACCESS_TOKEN
 ```
 
 Add this to your project level `settings.gradle`:
+
 ```groovy
 val githubPropertiesFile = File(rootDir, "github.properties")
 val githubProperties = java.util.Properties()
@@ -42,122 +46,101 @@ maven {
 ```
 
 Add this to your app `build.gradle`:
+
 ```groovy
 dependencies {
     implementation 'id.co.edtslib:tracker:2.3.21-0.0.13'
 }
 ```
 
-**Maven:**
-```xml
-<dependency>
-  <groupId>id.co.edtslib</groupId>
-  <artifactId>tracker</artifactId>
-  <version>2.3.21-0.0.13</version>
-</dependency>
-```
-
 ## Usage
 
-### 1. Initialize in Application Class
+### 1\. Initialize in Application Class
 
-Create an Application class and initialize Tracker in `onCreate()`:
+You **must** initialize the Tracker using the `Builder` in your `Application.onCreate()`.
 
 ```kotlin
 class App : Application() {
     override fun onCreate() {
         super.onCreate()
         
-        // Initialize Tracker
-        Tracker.init(
-            app = this,
-            baseUrl = "https://your-api.com/tracker/",
-            token = "your-api-token",
-            path = "apps-tracker-gateway",  // optional, default: "apps-tracker-gateway"
-            isLegacy = false                 // optional, default: false
-        )
-        
-        // Optional: Configure additional settings
-        Tracker.debugging = BuildConfig.DEBUG
-        Tracker.resend = true
-        Tracker.appVersion = BuildConfig.VERSION_NAME
+        // 1. Build the Configuration
+        Tracker.Builder(this)
+            .setBaseUrl("https://your-api.com/tracker/")
+            .setToken("your-api-token")
+            .setPath("apps-tracker-gateway") // Optional
+            .setDebugging(BuildConfig.DEBUG) // Enable logs in Debug mode
+            .setResend(true)                 // Retry failed requests
+            .setAppVersion(BuildConfig.VERSION_NAME)
+            .setSingleton(true)              // Sets this as the global instance (Default: true)
+            .build()
+            
+        // No need to assign it to a variable if setSingleton(true) is used.
     }
 }
 ```
 
-Register your Application class in `AndroidManifest.xml`:
-```xml
-<application
-    android:name=".App"
-    ...>
-</application>
-```
+### 2\. Track Events
 
-### 2. Get Tracker Instance
-
-Access the tracker singleton anywhere in your app:
+Access the tracker via the static Companion methods anywhere in your app. The library handles the singleton instance internally.
 
 ```kotlin
-import id.co.edtslib.tracker.di.manual.TrackerFactory
-
 class MainActivity : AppCompatActivity() {
-    
-    private val tracker = TrackerFactory.getTracker()
     
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         
         // Track page view
-        tracker.trackPage("Home", "home_screen")
+        Tracker.trackPage("Home", "home_screen")
         
         // Track user action
-        tracker.trackClick("login_button", category = "authentication")
+        Tracker.trackClick("login_button", category = "authentication")
     }
     
     override fun onResume() {
         super.onResume()
-        tracker.resumePage("Home", "home_screen")
+        Tracker.resumePage("Home", "home_screen")
     }
 }
 ```
 
 ## API Reference
 
-### Configuration
+### Configuration & User
 
 ```kotlin
 // Set user identifier
-tracker.setUserId(userId: Long)
+Tracker.setUserId(userId: Long)
 
 // Set user location
-tracker.setLatLng(lat: Double, lng: Double)
+Tracker.setLatLng(lat: Double, lng: Double)
 
 // Set service identifier
-tracker.setService(service: String)
+Tracker.setService(service: String)
 ```
 
 ### Page Tracking
 
 ```kotlin
 // Track page view
-tracker.trackPage(
+Tracker.trackPage(
     pageName: String,
     pageId: String,
     pageUrlPath: String = ""
 )
 
 // Track page details
-tracker.trackPageDetail(detail: Any?)
+Tracker.trackPageDetail(detail: Any?)
 
 // Resume page (for onResume lifecycle)
-tracker.resumePage(pageName: String, pageId: String)
+Tracker.resumePage(pageName: String, pageId: String)
 ```
 
 ### Event Tracking
 
 ```kotlin
 // Track user clicks
-tracker.trackClick(
+Tracker.trackClick(
     name: String,
     category: String? = null,
     url: String? = null,
@@ -165,54 +148,55 @@ tracker.trackClick(
 )
 
 // Track search
-tracker.trackSearch(
+Tracker.trackSearch(
     keyword: String,
     details: Any? = null
 )
 
 // Track filters applied
-tracker.trackFilters(
+Tracker.trackFilters(
     filters: List<TrackerFilterDetail>,
     category: String = ""
 )
 
 // Track sort action
-tracker.trackSort(sortType: String)
+Tracker.trackSort(sortType: String)
 ```
 
 ### Impression Tracking
 
 ```kotlin
 // Track impression manually
-tracker.trackImpression<SourceType, MappedType>(
+Tracker.trackImpression<SourceType, MappedType>(
     category: String,
     data: List<*>,
     mapper: ((data: SourceType) -> MappedType)? = null
 )
 
 // Auto-track RecyclerView impressions
-tracker.setImpressionRecyclerView<SourceType, MappedType>(
+// NOTE: Automatically handles scroll state per RecyclerView instance
+Tracker.setImpressionRecyclerView<SourceType, MappedType>(
     category: String,
     recyclerView: RecyclerView,
     mapper: ((data: SourceType) -> MappedType)? = null
 )
 
 // Track displayed items
-tracker.trackDisplayedItems(data: MutableList<Any>)
+Tracker.trackDisplayedItems(data: MutableList<Any>)
 ```
 
 ### Form Submission Tracking
 
 ```kotlin
 // Track successful submission
-tracker.trackSubmissionSuccess(
+Tracker.trackSubmissionSuccess(
     name: String,
     category: String,
     details: Any? = null
 )
 
 // Track failed submission
-tracker.trackSubmissionFailed(
+Tracker.trackSubmissionFailed(
     name: String,
     category: String,
     reason: String?,
@@ -224,194 +208,90 @@ tracker.trackSubmissionFailed(
 
 ```kotlin
 // Track app lifecycle events
-tracker.trackOpenApplication()
-tracker.trackCloseApplication()
-tracker.trackResumeApplication()
-tracker.trackMinimizeApplication()
+Tracker.trackOpenApplication()
+Tracker.trackCloseApplication()
+Tracker.trackResumeApplication()
+Tracker.trackMinimizeApplication()
 ```
 
 ### Install Attribution
 
 ```kotlin
 // Check install referrer (Google Play)
-tracker.checkInstallReferrer(activity: FragmentActivity)
+Tracker.checkInstallReferrer(activity: FragmentActivity)
 
 // Or manually provide referrer data
-tracker.checkInstallReferrer(
+Tracker.checkInstallReferrer(
     utm_raw: String?,
     intent: Intent?
 )
 
 // Get install referrer data
-tracker.getInstallReferer()
+Tracker.getInstallReferer()
 ```
 
 ### Data Access
 
 ```kotlin
 // Get current tracker data
-val data: TrackerData? = tracker.getData()
+val data: TrackerData? = Tracker.getData()
 
 // Get previous page name (useful for navigation context)
-val priorPageName: String? = tracker.getPriorPageName()
-```
+val priorPageName: String? = Tracker.getPriorPageName()
 
-## Advanced Configuration
-
-### Debug Mode
-
-Enable detailed logging during development:
-
-```kotlin
-Tracker.debugging = true  // Enable logs
-```
-
-### Resend Failed Requests
-
-Configure automatic retry for failed tracking requests:
-
-```kotlin
-Tracker.resend = true  // Enable automatic retry (default: true)
-```
-
-### Custom App Version
-
-Override the app version for tracking:
-
-```kotlin
-Tracker.appVersion = "1.0.0-beta"
+// Get local config (if needed)
+val config = Tracker.getTrackerLocalConfig()
 ```
 
 ## Integration with DI Frameworks
 
-### Works with Hilt
+Since this library uses a **Manual DI** approach internally, it is compatible with **all** DI frameworks without requiring any specific modules.
+
+### Works with Hilt / Dagger
+
+You do not need to provide a `@Module`. Simply call the static methods directly.
 
 ```kotlin
-@Module
-@InstallIn(SingletonComponent::class)
-object AppModule {
-    
-    @Provides
-    @Singleton
-    fun provideTracker(): Tracker {
-        return TrackerFactory.getTracker()
-    }
-}
-
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
-    @Inject lateinit var tracker: Tracker
+    // No @Inject needed!
+    
+    fun onUserAction() {
+        Tracker.trackClick("btn_save")
+    }
 }
 ```
 
 ### Works with Koin
 
-```kotlin
-val appModule = module {
-    single { TrackerFactory.getTracker() }
-}
-
-class MainActivity : AppCompatActivity() {
-    private val tracker: Tracker by inject()
-}
-```
-
-### Works with Dagger
-
-```kotlin
-@Module
-class AppModule {
-    @Provides
-    @Singleton
-    fun provideTracker(): Tracker = TrackerFactory.getTracker()
-}
-```
-
-### Works Without Any DI
+You do not need to declare a module.
 
 ```kotlin
 class MainActivity : AppCompatActivity() {
-    private val tracker = TrackerFactory.getTracker()
-}
-```
-
-## Example Usage
-
-### Complete Activity Example
-
-```kotlin
-class ProductListActivity : AppCompatActivity() {
+    // No 'by inject()' needed!
     
-    private val tracker = TrackerFactory.getTracker()
-    
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_product_list)
-        
-        // Track page view
-        tracker.trackPage("Product List", "product_list")
-        
-        // Setup impression tracking for RecyclerView
-        tracker.setImpressionRecyclerView<Product, ProductImpressionData>(
-            category = "products",
-            recyclerView = recyclerView,
-            mapper = { product ->
-                ProductImpressionData(
-                    id = product.id,
-                    name = product.name,
-                    price = product.price
-                )
-            }
-        )
-        
-        // Track filter application
-        filterButton.setOnClickListener {
-            tracker.trackFilters(
-                filters = listOf(
-                    TrackerFilterDetail("price", "100-500"),
-                    TrackerFilterDetail("category", "electronics")
-                ),
-                category = "products"
-            )
-        }
-        
-        // Track sort
-        sortButton.setOnClickListener {
-            tracker.trackSort("price_low_to_high")
-        }
-    }
-    
-    override fun onResume() {
-        super.onResume()
-        tracker.resumePage("Product List", "product_list")
+    fun onUserAction() {
+        Tracker.trackClick("btn_save")
     }
 }
 ```
 
-## Migration from Hilt-based Version
+## Unit Testing
 
-If you're upgrading from a Hilt-based version of this library:
+Because the library uses a Singleton pattern by default, testing requires careful management of state. You can initialize a fresh instance for testing without setting it as a singleton if needed, or simply build a new singleton for every test case.
 
-### Before (Hilt)
 ```kotlin
-@AndroidEntryPoint
-class MainActivity : AppCompatActivity() {
-    @Inject lateinit var tracker: Tracker
+@Test
+fun testTracking() {
+    // Re-initialize for test environment
+    Tracker.Builder(context)
+        .setBaseUrl("http://localhost:8080")
+        .setSingleton(true)
+        .build()
+        
+    Tracker.trackClick("test_click")
 }
 ```
-
-### After (Manual DI)
-```kotlin
-class MainActivity : AppCompatActivity() {
-    private val tracker = TrackerFactory.getTracker()
-}
-```
-
-**Changes Required:**
-1. Remove `@HiltAndroidApp` from Application class (if only used for Tracker)
-2. Remove Tracker Hilt modules
-3. Add `Tracker.init()` call in `Application.onCreate()`
-4. Replace injection with `TrackerFactory.getTracker()`
 
 ## Requirements
 
@@ -430,4 +310,4 @@ This library is proprietary software developed by [EDTS] for internal use.
 
 ## Support
 
-For issues, questions, or contributions, please visit [https://github.com/Dhanfinix/tracker]
+For issues, questions, or contributions, please visit [[https://github.com/Dhanfinix/tracker](https://github.com/Dhanfinix/tracker)]

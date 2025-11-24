@@ -1,5 +1,9 @@
 # Changelog
 
+## [2.3.21-0.0.16] - 2025-11-24
+### REFACTOR
++ Use Builder Pattern for better Manual DI 
+
 ## [2.3.21-0.0.15] - 2025-11-19
 ### REMOVE
 + Dagger hilt libs
