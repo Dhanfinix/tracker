@@ -1,5 +1,9 @@
 # Changelog
 
+## [2.3.21-0.0.17] - 2025-11-24
+### REFACTOR
++ Move TrackerConfig to its own file and default value
+
 ## [2.3.21-0.0.16] - 2025-11-24
 ### REFACTOR
 + Use Builder Pattern for better Manual DI 
