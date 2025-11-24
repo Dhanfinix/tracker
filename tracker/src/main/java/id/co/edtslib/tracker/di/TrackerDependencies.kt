@@ -11,15 +11,15 @@ import androidx.security.crypto.MasterKey
 import com.google.gson.Gson
 import com.securepreferences.SecurePreferences
 import id.co.edtslib.tracker.BuildConfig
-import id.co.edtslib.tracker.Tracker
 import id.co.edtslib.tracker.data.TrackerApiService
+import id.co.edtslib.tracker.data.TrackerConfig
 import id.co.edtslib.tracker.data.TrackerRemoteDataSource
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
 internal class TrackerDependencies(
     private val context: Context,
-    private val config: Tracker.TrackerConfig
+    private val config: TrackerConfig
 ) {
     private val trackerSharedPref: SharedPreferences by lazy {
         getSharedPrefs()

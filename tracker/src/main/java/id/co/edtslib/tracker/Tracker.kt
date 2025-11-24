@@ -12,6 +12,7 @@ import com.android.installreferrer.api.InstallReferrerStateListener
 import id.co.edtslib.baserecyclerview.BaseRecyclerViewAdapter
 import id.co.edtslib.baserecyclerview2.BaseRecyclerView2
 import id.co.edtslib.tracker.data.InstallReferer
+import id.co.edtslib.tracker.data.TrackerConfig
 import id.co.edtslib.tracker.data.TrackerData
 import id.co.edtslib.tracker.data.TrackerFilterDetail
 import id.co.edtslib.tracker.di.ConfigurationLocalSource
@@ -31,49 +32,23 @@ class Tracker private constructor( //force to use builder
         val time: Long
     )
 
-    data class TrackerConfig(
-        val baseUrl: String,
-        val token: String,
-        val path: String,
-        val isLegacy: Boolean,
-        val debugging: Boolean,
-        val resend: Boolean,
-        val appVersion: String
-    )
-
     class Builder(context: Context) {
         private val appContext = context.applicationContext
+        private val config = TrackerConfig()
 
-        private var baseUrl: String = "https://placeholder-tracker-url.com"
-        private var token: String = ""
-        private var path: String = "apps-tracker-gateway"
-        private var isLegacy: Boolean = false
-        private var debugging: Boolean = false
-        private var resend: Boolean = true
-        private var appVersion: String = "1.0.0"
-        private var isSingleton: Boolean = true
-
-        fun setBaseUrl(url: String) = apply { this.baseUrl = url }
-        fun setToken(token: String) = apply { this.token = token }
-        fun setPath(path: String) = apply { this.path = path }
-        fun setLegacy(isLegacy: Boolean) = apply { this.isLegacy = isLegacy }
-        fun setDebugging(debug: Boolean) = apply { this.debugging = debug }
-        fun setResend(resend: Boolean) = apply { this.resend = resend }
-        fun setAppVersion(version: String) = apply { this.appVersion = version }
-        fun setSingleton(isSingleton: Boolean) = apply { this.isSingleton = isSingleton }
+        fun setBaseUrl(url: String) = apply { config.baseUrl = url }
+        fun setToken(token: String) = apply { config.token = token }
+        fun setPath(path: String) = apply { config.path = path }
+        fun setLegacy(isLegacy: Boolean) = apply { config.isLegacy = isLegacy }
+        fun setDebugging(debug: Boolean) = apply { config.debugging = debug }
+        fun setResend(resend: Boolean) = apply { config.resend = resend }
+        fun setAppVersion(version: String) = apply { config.appVersion = version }
+        fun setSingleton(isSingleton: Boolean) = apply { config.isSingleton = isSingleton }
 
         fun build(): Tracker {
-            val config = TrackerConfig(
-                baseUrl,
-                token,
-                path,
-                isLegacy,
-                debugging,
-                resend,
-                appVersion
-            )
-            val trackerInstance = Tracker(appContext, config)
-            if (isSingleton) {
+            // use copy to avoid reference issues when a builder used by multiple build
+            val trackerInstance = Tracker(appContext, config.copy())
+            if (config.isSingleton) {
                 synchronized(Tracker::class.java) {
                     // Only ONE thread can be inside these curly braces at a time.
                     setSingleton(trackerInstance)

@@ -2,7 +2,7 @@ package id.co.edtslib.tracker.di
 
 import android.annotation.SuppressLint
 import com.facebook.stetho.okhttp3.StethoInterceptor
-import id.co.edtslib.tracker.Tracker
+import id.co.edtslib.tracker.data.TrackerConfig
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import java.security.SecureRandom
@@ -14,7 +14,7 @@ import javax.net.ssl.TrustManager
 import javax.net.ssl.X509TrustManager
 
 class UnsafeOkHttpClient(
-    private val config: Tracker.TrackerConfig
+    private val config: TrackerConfig
 ) {
     @SuppressLint("CustomX509TrustManager")
     fun get(): OkHttpClient {
