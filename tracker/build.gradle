@@ -14,7 +14,7 @@ githubProperties.load(new FileInputStream(rootProject.file("github.properties"))
  * Second part is this library's version
  */
 def getVersionName = { ->
-    return "2.3.21-0.0.17"
+    return "2.3.21-0.0.18"
 }
 
 // Function to retrieve artifact ID
@@ -136,4 +136,6 @@ dependencies {
     implementation 'androidx.compose.material3:material3'
     implementation 'androidx.compose.ui:ui-tooling-preview'
     debugImplementation 'androidx.compose.ui:ui-tooling'
+
+    implementation("org.jetbrains.kotlinx:kotlinx-collections-immutable:0.4.0")
 }
