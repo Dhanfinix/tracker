@@ -37,12 +37,12 @@ import kotlin.collections.plus
  * tracking event when scroll is idle
  * */
 @Composable
-fun <T> TrackerLazyColumn(
+fun <T, Mapped> TrackerLazyColumn(
     modifier: Modifier = Modifier,
     listData: ImmutableList<T>,
     enableImpressionTracking: Boolean = false,
     trackerCategory: String? = null,
-    trackerMapper: ((T) -> String)? = null,
+    trackerMapper: ((T) -> Mapped)? = null,
     contentPadding: PaddingValues = PaddingValues(0.dp),
     reverseLayout: Boolean = false,
     verticalArrangement: Arrangement.Vertical =
