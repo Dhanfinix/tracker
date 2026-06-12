@@ -15,6 +15,7 @@ import id.co.edtslib.tracker.data.InstallReferer
 import id.co.edtslib.tracker.data.TrackerConfig
 import id.co.edtslib.tracker.data.TrackerData
 import id.co.edtslib.tracker.data.TrackerFilterDetail
+import id.co.edtslib.tracker.di.AuthInterceptor
 import id.co.edtslib.tracker.di.ConfigurationLocalSource
 import id.co.edtslib.tracker.di.TrackerDependencies
 import java.util.Date
@@ -44,6 +45,7 @@ class Tracker private constructor( //force to use builder
         fun setResend(resend: Boolean) = apply { config.resend = resend }
         fun setAppVersion(version: String) = apply { config.appVersion = version }
         fun setSingleton(isSingleton: Boolean) = apply { config.isSingleton = isSingleton }
+        fun setAuthInterceptor(authInterceptor: AuthInterceptor) = apply { this.config.authInterceptor = authInterceptor }
 
         fun build(): Tracker {
             // use copy to avoid reference issues when a builder used by multiple build

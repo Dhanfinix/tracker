@@ -58,7 +58,7 @@ internal class TrackerDependencies(
         .client(
             UnsafeOkHttpClient(config).get()
                 .newBuilder()
-                .addInterceptor(AuthInterceptor(config.token, config.isLegacy))
+                .addInterceptor(config.authInterceptor ?: AuthInterceptor(config.token, config.isLegacy))
                 .build()
         )
         .addConverterFactory(GsonConverterFactory.create(Gson()))
