@@ -1,5 +1,9 @@
 # Changelog
 
+## [2.3.21-0.0.20] - 2026-07-08
+### CHANGE
++ Project files package name to differentiate with original EdtsKu
+
 ## [2.3.21-0.0.19] - 2025-12-24
 ### FEAT
 + Add ScreenLifecycleTracker and generalize TrackerLazyColumn mapper
