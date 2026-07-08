@@ -55,7 +55,7 @@ afterEvaluate {
 }
 
 android {
-    namespace 'id.co.edtslib.tracker'
+    namespace 'id.co.edtslib.tracker_modern'
     compileSdk 36
 
     defaultConfig {

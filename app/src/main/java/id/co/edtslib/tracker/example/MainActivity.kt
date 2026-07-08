@@ -5,8 +5,8 @@ import android.os.Handler
 import android.os.Looper
 import androidx.appcompat.app.AppCompatActivity
 import id.co.edtslib.edtsds.list.menu.MenuListView
-import id.co.edtslib.tracker.Tracker
-import id.co.edtslib.tracker.data.TrackerFilterDetail
+import id.co.edtslib.tracker_modern.Tracker
+import id.co.edtslib.tracker_modern.data.TrackerFilterDetail
 
 class MainActivity : AppCompatActivity() {
 

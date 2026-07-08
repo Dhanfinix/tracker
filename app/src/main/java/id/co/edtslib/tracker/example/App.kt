@@ -1,7 +1,7 @@
 package id.co.edtslib.tracker.example
 
 import android.app.Application
-import id.co.edtslib.tracker.Tracker
+import id.co.edtslib.tracker_modern.Tracker
 
 class App: Application(){
     override fun onCreate() {
